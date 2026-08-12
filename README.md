@@ -4,14 +4,17 @@ Virtual Steer is an ultra-low latency, high-precision virtual steering wheel con
 
 ---
 
-## ⚡ Core Features
+## ⚡ Core Features & Recent Upgrades
 
-* **High-Frequency Motion Steering:** Uses hardware-fused `Rotation Vector` sensors running at **100Hz–200Hz** for ultra-responsive control.
-* **Analog Pedals:** On-screen sliders for precision Throttle, Brake, and Clutch inputs.
-* **7 Programmable Action Buttons:** Integrated mapping for Handbrake, Sequential Gear Shift Up/Down, Pause, Horn, Camera, and Headlights.
-* **Zero-Configuration Auto-Discovery:** Dynamic subnet broadcasting finds the Windows companion server instantly on local Wi-Fi or when connected via **Android Hotspot**.
-* **Smart Angle Calibration:** Seamlessly handles 360° sensor wrap-around (`[-180°, 180°]`) to prevent sudden controller snapping, regardless of how you hold your device.
-* **Advanced Diagnostics Panel:** Real-time sensor charts, outgoing binary packet inspector, UDP performance telemetry, and event logger.
+* **🎮 Drag-and-Drop Layout Editor:** Fully customizable button positioning. Tap **"Adjust Button Positions"** in Settings to enter edit mode, drag buttons (`Pause`, `Cam`, `Lights`, `GEAR-`, `HBRAKE`, `GEAR+`, and `📻 RADIO`) anywhere on the screen, and click **"Save & Exit"** to persist your layout.
+* **📏 135° Steering Limits:** Reconfigured default handling sensitivity to map to 135° steering by default for optimal control.
+* **📻 Compact Radio Channel Control:** Includes a dedicated, compact `📻 RADIO` station button that cycles channels by pulsing `DpadRight` (standard radio button for NFS, Forza, and GTA V).
+* **🔋 Live Battery Tracking:** Direct integration with Android's `BatteryManager` service to display real-time mobile battery status on the main dashboard and diagnostics.
+* **⚙️ Detailed Pedals & Sensor Settings:**
+  * **Pedal Tuning:** Set custom Pedal Deadzone thresholds, Smoothing filters to reduce jitter, and Invert pedal orientations.
+  * **Sensor Source Selection:** Choose between **Rotation Vector** (Gyroscope-assisted sensor fusion) or **Accelerometer** (Gravity tilt roll fallback for budget devices).
+* **🧹 Clutter-Free UI:** Hidden layout adjustments, steering angles, and detailed latency metrics from the main driving HUD to keep focus purely on the road.
+* **🏎️ Zero-Configuration Auto-Discovery:** Broadcasting UDP packets find your PC receiver instantly on local Wi-Fi or when using **Android Hotspot**.
 
 ---
 
@@ -24,7 +27,7 @@ You can compile a standalone `.apk` directly from this repository using **Androi
 * **Android SDK** (API Level 34+ recommended).
 
 ### 1. Build via Command Line (CLI)
-Open your terminal (PowerShell or Command Prompt) in this project directory:
+Open your terminal in the `virtual_steer` project directory:
 
 * **Compile Debug APK (Fastest, for testing):**
   ```cmd
@@ -47,7 +50,7 @@ Open your terminal (PowerShell or Command Prompt) in this project directory:
 
 ### 2. Build via Android Studio
 1. Open Android Studio and select **File > Open**.
-2. Select the directory: `C:\Users\Shubham\AndroidStudioProjects\virtual_steer`.
+2. Select the directory: `C:\Users\Shubham\.gemini\antigravity\scratch\VirtualSteerReceiver\virtual_steer`.
 3. Wait for the Gradle sync to finish.
 4. Click **Build > Build Bundle(s) / APK(s) > Build APK(s)** in the top menu.
 5. A popup will appear in the bottom-right corner when complete. Click **Locate** to find the output APK.
@@ -68,7 +71,7 @@ For the lowest possible latency and minimum interference, **Mobile Hotspot Mode*
 
 ---
 
-## 📊 Communication Protocol (v1)
+## 📊 Communication Protocol (v1.1)
 
 Data is serialized into a highly compacted **24-byte binary packet** for maximum network throughput:
 
@@ -81,8 +84,7 @@ Data is serialized into a highly compacted **24-byte binary packet** for maximum
 | **8** | Float | Throttle | Gas pedal `[0.0, 1.0]` |
 | **12** | Float | Brake | Brake pedal `[0.0, 1.0]` |
 | **16** | Float | Clutch | Clutch pedal `[0.0, 1.0]` |
-| **20** | Byte | Buttons | Bitfield mapped to Xbox digital buttons |
-| **21** | Byte | Reserved | Alignment padding (always `0`) |
+| **20** | UShort | Buttons | 16-bit bitfield mapped to Xbox digital buttons |
 | **22** | Short | CRC | 16-bit Checksum (calculated over offsets 0-21) |
 
 ### Action Button Bitfield Maps
@@ -93,3 +95,10 @@ Data is serialized into a highly compacted **24-byte binary packet** for maximum
 * **Bit 4:** Horn
 * **Bit 5:** Camera
 * **Bit 6:** Headlights
+* **Bit 7:** D-pad Up (Menu Navigate)
+* **Bit 8:** D-pad Down (Menu Navigate)
+* **Bit 9:** D-pad Left (Menu Navigate)
+* **Bit 10:** D-pad Right / Radio (pulsed via dedicated HUD button)
+* **Bit 11:** Left Shoulder / LB (Xbox game mappings)
+* **Bit 12:** Right Shoulder / RB (Xbox game mappings)
+* **Bit 13:** Back / Select (Xbox game mappings)
