@@ -109,13 +109,15 @@ class UDPClient(
     }
 
     private fun startSenderLoop() {
-        val intervalMs = (1000f / config.get().packetRate.coerceAtLeast(1)).toLong()
+        val intervalNs = 1_000_000_000L / config.get().packetRate.coerceAtLeast(1)
         
         senderJob = scope.launch(Dispatchers.IO) {
             var lastHeartbeat = 0L
             var packetsSent = 0L
             var rateWindowStart = System.currentTimeMillis()
             var packetsInWindow = 0
+            
+            var nextSendTimeNs = System.nanoTime()
             
             while (isActive) {
                 val state = latestState.get()
@@ -157,7 +159,26 @@ class UDPClient(
                         Log.e(TAG, "Transmission error", e)
                     }
                 }
-                delay(intervalMs)
+                
+                // Schedule next send tick and sleep with nano-precision
+                nextSendTimeNs += intervalNs
+                val nowNs = System.nanoTime()
+                val sleepTimeNs = nextSendTimeNs - nowNs
+                if (sleepTimeNs > 0) {
+                    val sleepMs = sleepTimeNs / 1_000_000L
+                    val sleepNs = (sleepTimeNs % 1_000_000L).toInt()
+                    try {
+                        Thread.sleep(sleepMs, sleepNs)
+                    } catch (e: InterruptedException) {
+                        break
+                    }
+                } else {
+                    // Running behind, yield thread and re-align timing anchor if falling too far behind (50ms)
+                    Thread.yield()
+                    if (nowNs - nextSendTimeNs > 50_000_000L) {
+                        nextSendTimeNs = nowNs
+                    }
+                }
             }
         }
     }

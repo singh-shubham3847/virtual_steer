@@ -36,7 +36,7 @@ class RotationSensor(context: Context) : SensorEventListener {
             sensorManager.registerListener(
                 this,
                 it,
-                SensorManager.SENSOR_DELAY_GAME
+                SensorManager.SENSOR_DELAY_FASTEST
             )
         }
     }
