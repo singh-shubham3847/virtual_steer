@@ -85,6 +85,126 @@ fun PairScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // USB Wired Connection Helper
+        var showUsbDialog by remember { mutableStateOf(false) }
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(GridPanelBg)
+                .border(1.dp, ThrottleGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                .clickable { showUsbDialog = true }
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "🔌 CONNECT VIA WIRED USB",
+                    color = ThrottleGreen,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+        }
+
+        if (showUsbDialog) {
+            AlertDialog(
+                onDismissRequest = { showUsbDialog = false },
+                title = {
+                    Text(
+                        "Wired USB Guide",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                },
+                text = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Text(
+                            "USB connection cuts latency to <1ms and guarantees zero wireless packet loss.",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "1. Connect phone to PC using a USB data cable.",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Text(
+                            "2. Tap the button below to open Tethering settings.",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Text(
+                            "3. Turn on \"USB Tethering\" or \"USB sharing\".",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Text(
+                            "4. Return to this app. The PC will appear in the list.",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            try {
+                                val intent = android.content.Intent().apply {
+                                    action = "android.intent.action.MAIN"
+                                    setClassName("com.android.settings", "com.android.settings.TetherSettings")
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                try {
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS).apply {
+                                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                    }
+                                    context.startActivity(intent)
+                                } catch (e2: Exception) {
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_SETTINGS).apply {
+                                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                    }
+                                    context.startActivity(intent)
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = ThrottleGreen),
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text("TETHERING SETTINGS", color = CarbonDark, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showUsbDialog = false }) {
+                        Text("CLOSE", color = Color.White.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
+                    }
+                },
+                containerColor = CarbonDark,
+                shape = RoundedCornerShape(12.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Available Receivers

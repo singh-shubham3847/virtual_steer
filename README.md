@@ -15,6 +15,7 @@ Virtual Steer is an ultra-low latency, high-precision virtual steering wheel con
   * **Sensor Source Selection:** Choose between **Rotation Vector** (Gyroscope-assisted sensor fusion) or **Accelerometer** (Gravity tilt roll fallback for budget devices).
 * **🧹 Clutter-Free UI:** Hidden layout adjustments, steering angles, and detailed latency metrics from the main driving HUD to keep focus purely on the road.
 * **🏎️ Zero-Configuration Auto-Discovery:** Broadcasting UDP packets find your PC receiver instantly on local Wi-Fi or when using **Android Hotspot**.
+* **🔌 Wired USB Connection (Tethering):** Cuts ping response latency to <1ms and guarantees zero packet loss. Includes a direct shortcut in the Pairing/Settings menu to launch the system Tethering settings in one tap.
 
 ---
 

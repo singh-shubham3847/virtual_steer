@@ -175,6 +175,40 @@ fun SettingsScreen(
                     checked = config.network.autoDiscover,
                     onCheckedChange = { viewModel.updateNetwork { n -> n.copy(autoDiscover = it) } }
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val context = androidx.compose.ui.platform.LocalContext.current
+                Button(
+                    onClick = {
+                        try {
+                            val intent = android.content.Intent().apply {
+                                action = "android.intent.action.MAIN"
+                                setClassName("com.android.settings", "com.android.settings.TetherSettings")
+                                flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            try {
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS).apply {
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            } catch (e2: Exception) {
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_SETTINGS).apply {
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(40.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = GridPanelBg),
+                    shape = RoundedCornerShape(4.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MetallicBorder)
+                ) {
+                    Text("🔌 USB TETHERING SETTINGS", color = ThrottleGreen, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                }
                 
                 if (!config.network.autoDiscover) {
                     Spacer(modifier = Modifier.height(16.dp))
