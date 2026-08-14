@@ -45,7 +45,11 @@ class PedalProcessor(
         value = curveOutput
 
         // Step 5: Smoothing (Low-pass)
-        smoothedValue += (value - smoothedValue) * config.smoothing
+        if (rawValue == 0f) {
+            smoothedValue = value
+        } else {
+            smoothedValue += (value - smoothedValue) * config.smoothing
+        }
         
         // Step 6: Apply Precision
         val finalOutput = if (config.precision > 0) {

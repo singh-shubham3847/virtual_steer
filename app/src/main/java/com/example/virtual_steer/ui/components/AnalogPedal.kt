@@ -11,6 +11,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
@@ -102,32 +104,31 @@ fun AnalogPedalZone(
         modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val position = event.changes.first().position
-
-                        when (event.type) {
-                            PointerEventType.Press -> {
-                                touchOrigin = position
-                                currentTouch = position
-                                rawValue = 0f
+                awaitEachGesture {
+                    try {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        touchOrigin = down.position
+                        currentTouch = down.position
+                        rawValue = 0f
+                        
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull { it.id == down.id }
+                            if (change == null || !change.pressed) {
+                                break
                             }
-                            PointerEventType.Move -> {
-                                touchOrigin?.let { origin ->
-                                    currentTouch = position
-                                    // Calculate relative drag UPWARDS from origin
-                                    val deltaY = origin.y - position.y
-                                    val input = (deltaY / config.maxDragPx).coerceIn(0f, 1f)
-                                    rawValue = applyDeadZones(input, config)
-                                }
+                            currentTouch = change.position
+                            touchOrigin?.let { origin ->
+                                val deltaY = origin.y - change.position.y
+                                val input = (deltaY / config.maxDragPx).coerceIn(0f, 1f)
+                                rawValue = applyDeadZones(input, config)
                             }
-                            PointerEventType.Release -> {
-                                touchOrigin = null
-                                currentTouch = null
-                                rawValue = 0f
-                            }
+                            change.consume()
                         }
+                    } finally {
+                        touchOrigin = null
+                        currentTouch = null
+                        rawValue = 0f
                     }
                 }
             }
