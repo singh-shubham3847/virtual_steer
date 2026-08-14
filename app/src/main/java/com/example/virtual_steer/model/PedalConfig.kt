@@ -11,7 +11,7 @@ enum class PedalResponseCurve {
 data class PedalConfig(
     val throttleCurve: PedalResponseCurve = PedalResponseCurve.RACING,
     val brakeCurve: PedalResponseCurve = PedalResponseCurve.RACING,
-    val deadZone: Float = 0.05f,
+    val deadZone: Float = 0.0f,
     val smoothing: Float = 0.20f,
     val invert: Boolean = false,
     val precision: Float = 0.001f,

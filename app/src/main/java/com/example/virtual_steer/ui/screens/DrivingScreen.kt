@@ -80,9 +80,9 @@ fun DrivingScreen(
     // Shared config for pedals
     val pedalConfig = remember {
         PedalUIConfig(
-            smoothingEnabled = true,
-            smoothingFactor = 0.25f,
-            responseCurve = PedalResponseCurve.RACING,
+            smoothingEnabled = false,
+            smoothingFactor = 1.0f,
+            responseCurve = PedalResponseCurve.LINEAR,
             showDebug = true,
             maxDragPx = 400f
         )
