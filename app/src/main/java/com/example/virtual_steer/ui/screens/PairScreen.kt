@@ -31,9 +31,6 @@ fun PairScreen(
 ) {
     val discoveredServers by viewModel.discoveredServers.collectAsState()
     val connectionState by viewModel.connectionState.collectAsState()
-    
-    var manualIp by remember { mutableStateOf("") }
-    var manualPort by remember { mutableStateOf("4444") }
 
     LaunchedEffect(connectionState.status) {
         if (connectionState.status == ConnectionStatus.CONNECTED) {
@@ -41,69 +38,73 @@ fun PairScreen(
         }
     }
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxSize()
             .background(CarbonDark)
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Text(
-            text = "VIRTUAL STEER",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Black,
-            fontFamily = FontFamily.Monospace
-        )
-        
-        Text(
-            text = "PAIR WITH PC",
-            color = ThrottleGreen,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            letterSpacing = 2.sp
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Discovery Status
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // LEFT COLUMN: Branding, Searching Status, and USB button
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(16.dp),
-                color = ThrottleGreen,
-                strokeWidth = 2.dp
-            )
             Text(
-                text = "SEARCHING...",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 12.sp,
+                text = "VIRTUAL STEER",
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
                 fontFamily = FontFamily.Monospace
             )
-        }
+            
+            Text(
+                text = "PAIR WITH PC",
+                color = ThrottleGreen,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                letterSpacing = 2.sp
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // USB Wired Connection Helper
-        var showUsbDialog by remember { mutableStateOf(false) }
-        val context = androidx.compose.ui.platform.LocalContext.current
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(GridPanelBg)
-                .border(1.dp, ThrottleGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                .clickable { showUsbDialog = true }
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
+            // Discovery Status
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = ThrottleGreen,
+                    strokeWidth = 2.dp
+                )
+                Text(
+                    text = "SEARCHING...",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // USB Wired Connection Helper
+            var showUsbDialog by remember { mutableStateOf(false) }
+            val context = androidx.compose.ui.platform.LocalContext.current
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(GridPanelBg)
+                    .border(1.dp, ThrottleGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                    .clickable { showUsbDialog = true }
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "🔌 CONNECT VIA WIRED USB",
@@ -113,193 +114,159 @@ fun PairScreen(
                     fontFamily = FontFamily.Monospace
                 )
             }
-        }
 
-        if (showUsbDialog) {
-            AlertDialog(
-                onDismissRequest = { showUsbDialog = false },
-                title = {
-                    Text(
-                        "Wired USB Guide",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
-                    )
-                },
-                text = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    ) {
+            if (showUsbDialog) {
+                AlertDialog(
+                    onDismissRequest = { showUsbDialog = false },
+                    title = {
                         Text(
-                            "USB connection cuts latency to <1ms and guarantees zero wireless packet loss.",
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 12.sp,
+                            "Wired USB Guide",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "1. Connect phone to PC using a USB data cable.",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                        Text(
-                            "2. Tap the button below to open Tethering settings.",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                        Text(
-                            "3. Turn on \"USB Tethering\" or \"USB sharing\".",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                        Text(
-                            "4. Return to this app. The PC will appear in the list.",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            try {
-                                val intent = android.content.Intent().apply {
-                                    action = "android.intent.action.MAIN"
-                                    setClassName("com.android.settings", "com.android.settings.TetherSettings")
-                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                                context.startActivity(intent)
-                            } catch (e: Exception) {
+                    },
+                    text = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        ) {
+                            Text(
+                                "USB connection cuts latency to <1ms and guarantees zero wireless packet loss.",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 12.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "1. Connect phone to PC using a USB data cable.",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                            Text(
+                                "2. Tap the button below to open Tethering settings.",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                            Text(
+                                "3. Turn on \"USB Tethering\" or \"USB sharing\".",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                            Text(
+                                "4. Return to this app. The PC will appear in the list.",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
                                 try {
-                                    val intent = android.content.Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS).apply {
+                                    val intent = android.content.Intent().apply {
+                                        action = "android.intent.action.MAIN"
+                                        setClassName("com.android.settings", "com.android.settings.TetherSettings")
                                         flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
                                     }
                                     context.startActivity(intent)
-                                } catch (e2: Exception) {
-                                    val intent = android.content.Intent(android.provider.Settings.ACTION_SETTINGS).apply {
-                                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                } catch (e: Exception) {
+                                    try {
+                                        val intent = android.content.Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS).apply {
+                                            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (e2: Exception) {
+                                        val intent = android.content.Intent(android.provider.Settings.ACTION_SETTINGS).apply {
+                                            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(intent)
                                     }
-                                    context.startActivity(intent)
                                 }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = ThrottleGreen),
-                        shape = RoundedCornerShape(4.dp)
-                    ) {
-                        Text("TETHERING SETTINGS", color = CarbonDark, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showUsbDialog = false }) {
-                        Text("CLOSE", color = Color.White.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
-                    }
-                },
-                containerColor = CarbonDark,
-                shape = RoundedCornerShape(12.dp)
-            )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = ThrottleGreen),
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text("TETHERING SETTINGS", color = CarbonDark, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showUsbDialog = false }) {
+                            Text("CLOSE", color = Color.White.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
+                        }
+                    },
+                    containerColor = CarbonDark,
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
+
+            AnimatedVisibility(visible = connectionState.status == ConnectionStatus.CONNECTING) {
+                Text(
+                    text = "Connecting to ${connectionState.serverIp}...",
+                    color = AccentYellow,
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // RIGHT COLUMN: Available Receivers List
+        Column(
+            modifier = Modifier
+                .weight(1.2f)
+                .fillMaxHeight()
+        ) {
+            Text(
+                text = "AVAILABLE RECEIVERS",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Available Receivers
-        Text(
-            text = "AVAILABLE RECEIVERS",
-            color = Color.White.copy(alpha = 0.5f),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            modifier = Modifier.align(Alignment.Start)
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Box(modifier = Modifier.weight(1f)) {
-            if (discoveredServers.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        "No PC found yet.\nCheck same Wi-Fi or Hotspot.",
-                        color = Color.White.copy(alpha = 0.3f),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(discoveredServers) { server ->
-                        ServerCard(server = server) {
-                            viewModel.connectToPC(server.ip, server.port, server.name)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                if (discoveredServers.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(GridPanelBg.copy(alpha = 0.3f))
+                            .border(1.dp, MetallicBorder, RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No PC found yet.\nCheck same Wi-Fi or Hotspot.",
+                            color = Color.White.copy(alpha = 0.3f),
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily.Monospace,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 8.dp)
+                    ) {
+                        items(discoveredServers) { server ->
+                            ServerCard(server = server) {
+                                viewModel.connectToPC(server.ip, server.port, server.name)
+                            }
                         }
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Manual IP Fallback
-        Text(
-            text = "MANUAL CONNECTION",
-            color = Color.White.copy(alpha = 0.5f),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            modifier = Modifier.align(Alignment.Start)
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = manualIp,
-                onValueChange = { manualIp = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("192.168.x.x", color = Color.White.copy(alpha = 0.3f)) },
-                textStyle = LocalTextStyle.current.copy(color = Color.White, fontFamily = FontFamily.Monospace, fontSize = 14.sp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ThrottleGreen,
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f)
-                ),
-                singleLine = true
-            )
-            
-            Button(
-                onClick = { 
-                    val port = manualPort.toIntOrNull() ?: 4444
-                    if (manualIp.isNotEmpty()) {
-                        viewModel.connectToPC(manualIp, port, "Manual PC")
-                    }
-                },
-                modifier = Modifier.height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GridPanelBg),
-                shape = RoundedCornerShape(4.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, MetallicBorder)
-            ) {
-                Text("CONNECT", color = ThrottleGreen, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-            }
-        }
-        
-        AnimatedVisibility(visible = connectionState.status == ConnectionStatus.CONNECTING) {
-            Text(
-                text = "Connecting to ${connectionState.serverIp}...",
-                color = AccentYellow,
-                fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.padding(top = 16.dp)
-            )
         }
     }
 }
