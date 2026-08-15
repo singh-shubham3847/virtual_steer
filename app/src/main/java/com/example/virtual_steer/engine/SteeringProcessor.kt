@@ -31,8 +31,11 @@ class SteeringProcessor(
         
         var value = calibrated
 
-        // Step 2: Dead zone
-        val deadZoneValue = if (abs(value) < config.deadZone) 0f else value
+        // Step 2: Dead zone (scaled by maxAngle and scaled smoothly to prevent snaps)
+        val deadZoneDegrees = config.deadZone * config.maxAngle
+        val deadZoneValue = if (abs(value) < deadZoneDegrees) 0f else {
+            sign(value) * (abs(value) - deadZoneDegrees) / (1f - config.deadZone)
+        }
         value = deadZoneValue
 
         // Step 3: Sensitivity

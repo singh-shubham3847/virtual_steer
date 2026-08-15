@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class SteeringConfig(
     val sensitivity: Float = 1.0f,
     val deadZone: Float = 0.0f,
-    val smoothing: Float = 0.2f,
+    val smoothing: Float = 0.08f,
     val maxAngle: Float = 135f,
     val invert: Boolean = false,
     val responseCurve: Float = 1.0f, // 1.0 = Linear

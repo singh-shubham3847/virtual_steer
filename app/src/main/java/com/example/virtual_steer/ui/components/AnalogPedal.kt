@@ -107,9 +107,24 @@ fun AnalogPedalZone(
                 awaitEachGesture {
                     try {
                         val down = awaitFirstDown(requireUnconsumed = false)
+                        val height = size.height.toFloat()
+                        
                         touchOrigin = down.position
                         currentTouch = down.position
-                        rawValue = 0f
+                        
+                        // Active range with 15% padding at top and bottom for easy reach on high-res screens
+                        val bottomLimit = height * 0.85f
+                        val topLimit = height * 0.15f
+                        
+                        fun calculateInput(y: Float): Float {
+                            return when {
+                                y >= bottomLimit -> 0f
+                                y <= topLimit -> 1f
+                                else -> (bottomLimit - y) / (bottomLimit - topLimit)
+                            }
+                        }
+
+                        rawValue = applyDeadZones(calculateInput(down.position.y), config)
                         
                         while (true) {
                             val event = awaitPointerEvent()
@@ -118,11 +133,7 @@ fun AnalogPedalZone(
                                 break
                             }
                             currentTouch = change.position
-                            touchOrigin?.let { origin ->
-                                val deltaY = origin.y - change.position.y
-                                val input = (deltaY / config.maxDragPx).coerceIn(0f, 1f)
-                                rawValue = applyDeadZones(input, config)
-                            }
+                            rawValue = applyDeadZones(calculateInput(change.position.y), config)
                             change.consume()
                         }
                     } finally {
