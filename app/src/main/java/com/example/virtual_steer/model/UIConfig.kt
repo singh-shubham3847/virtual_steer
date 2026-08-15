@@ -30,5 +30,14 @@ data class UIConfig(
     val gearUpX: Float = 0.62f,
     val gearUpY: Float = 0.90f,
     val radioX: Float = 0.88f,
-    val radioY: Float = 0.50f
+    val radioY: Float = 0.50f,
+    
+    // Custom button sizes/scales
+    val pauseScale: Float = 1.0f,
+    val camScale: Float = 1.0f,
+    val lightsScale: Float = 1.0f,
+    val gearDownScale: Float = 1.0f,
+    val handbrakeScale: Float = 1.0f,
+    val gearUpScale: Float = 1.0f,
+    val radioScale: Float = 1.0f
 )

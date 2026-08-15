@@ -59,18 +59,25 @@ fun NavGraph(
                 showRadio = config.ui.showRadio,
                 pauseX = config.ui.pauseX,
                 pauseY = config.ui.pauseY,
+                pauseScale = config.ui.pauseScale,
                 camX = config.ui.camX,
                 camY = config.ui.camY,
+                camScale = config.ui.camScale,
                 lightsX = config.ui.lightsX,
                 lightsY = config.ui.lightsY,
+                lightsScale = config.ui.lightsScale,
                 gearDownX = config.ui.gearDownX,
                 gearDownY = config.ui.gearDownY,
+                gearDownScale = config.ui.gearDownScale,
                 handbrakeX = config.ui.handbrakeX,
                 handbrakeY = config.ui.handbrakeY,
+                handbrakeScale = config.ui.handbrakeScale,
                 gearUpX = config.ui.gearUpX,
                 gearUpY = config.ui.gearUpY,
+                gearUpScale = config.ui.gearUpScale,
                 radioX = config.ui.radioX,
                 radioY = config.ui.radioY,
+                radioScale = config.ui.radioScale,
                 onBackClick = { navController.popBackStack() },
                 onBrakeChange = { controllerViewModel.updateBrake(it) },
                 onThrottleChange = { controllerViewModel.updateThrottle(it) },
@@ -81,16 +88,16 @@ fun NavGraph(
                 onCamClick = { controllerViewModel.pulseCamera() },
                 onLightsClick = { controllerViewModel.pulseHeadlights() },
                 onRadioClick = { controllerViewModel.pulseDpadRight() },
-                onSaveLayout = { pX, pY, cX, cY, lX, lY, gdX, gdY, hX, hY, guX, guY, rX, rY ->
+                onSaveLayout = { pX, pY, pS, cX, cY, cS, lX, lY, lS, gdX, gdY, gdS, hX, hY, hS, guX, guY, guS, rX, rY, rS ->
                     settingsViewModel.updateUI { u ->
                         u.copy(
-                            pauseX = pX, pauseY = pY,
-                            camX = cX, camY = cY,
-                            lightsX = lX, lightsY = lY,
-                            gearDownX = gdX, gearDownY = gdY,
-                            handbrakeX = hX, handbrakeY = hY,
-                            gearUpX = guX, gearUpY = guY,
-                            radioX = rX, radioY = rY
+                            pauseX = pX, pauseY = pY, pauseScale = pS,
+                            camX = cX, camY = cY, camScale = cS,
+                            lightsX = lX, lightsY = lY, lightsScale = lS,
+                            gearDownX = gdX, gearDownY = gdY, gearDownScale = gdS,
+                            handbrakeX = hX, handbrakeY = hY, handbrakeScale = hS,
+                            gearUpX = guX, gearUpY = guY, gearUpScale = guS,
+                            radioX = rX, radioY = rY, radioScale = rS
                         )
                     }
                 }
@@ -131,18 +138,25 @@ fun NavGraph(
                 startInEditMode = true,
                 pauseX = config.ui.pauseX,
                 pauseY = config.ui.pauseY,
+                pauseScale = config.ui.pauseScale,
                 camX = config.ui.camX,
                 camY = config.ui.camY,
+                camScale = config.ui.camScale,
                 lightsX = config.ui.lightsX,
                 lightsY = config.ui.lightsY,
+                lightsScale = config.ui.lightsScale,
                 gearDownX = config.ui.gearDownX,
                 gearDownY = config.ui.gearDownY,
+                gearDownScale = config.ui.gearDownScale,
                 handbrakeX = config.ui.handbrakeX,
                 handbrakeY = config.ui.handbrakeY,
+                handbrakeScale = config.ui.handbrakeScale,
                 gearUpX = config.ui.gearUpX,
                 gearUpY = config.ui.gearUpY,
+                gearUpScale = config.ui.gearUpScale,
                 radioX = config.ui.radioX,
                 radioY = config.ui.radioY,
+                radioScale = config.ui.radioScale,
                 onBackClick = { navController.popBackStack() },
                 onBrakeChange = { controllerViewModel.updateBrake(it) },
                 onThrottleChange = { controllerViewModel.updateThrottle(it) },
@@ -153,16 +167,16 @@ fun NavGraph(
                 onCamClick = { controllerViewModel.pulseCamera() },
                 onLightsClick = { controllerViewModel.pulseHeadlights() },
                 onRadioClick = { controllerViewModel.pulseDpadRight() },
-                onSaveLayout = { pX, pY, cX, cY, lX, lY, gdX, gdY, hX, hY, guX, guY, rX, rY ->
+                onSaveLayout = { pX, pY, pS, cX, cY, cS, lX, lY, lS, gdX, gdY, gdS, hX, hY, hS, guX, guY, guS, rX, rY, rS ->
                     settingsViewModel.updateUI { u ->
                         u.copy(
-                            pauseX = pX, pauseY = pY,
-                            camX = cX, camY = cY,
-                            lightsX = lX, lightsY = lY,
-                            gearDownX = gdX, gearDownY = gdY,
-                            handbrakeX = hX, handbrakeY = hY,
-                            gearUpX = guX, gearUpY = guY,
-                            radioX = rX, radioY = rY
+                            pauseX = pX, pauseY = pY, pauseScale = pS,
+                            camX = cX, camY = cY, camScale = cS,
+                            lightsX = lX, lightsY = lY, lightsScale = lS,
+                            gearDownX = gdX, gearDownY = gdY, gearDownScale = gdS,
+                            handbrakeX = hX, handbrakeY = hY, handbrakeScale = hS,
+                            gearUpX = guX, gearUpY = guY, gearUpScale = guS,
+                            radioX = rX, radioY = rY, radioScale = rS
                         )
                     }
                     navController.popBackStack() // Go back to settings after saving layout config

@@ -1,6 +1,7 @@
 package com.example.virtual_steer.ui.screens
 
 import androidx.compose.foundation.background
+import java.util.Locale
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -42,18 +43,25 @@ fun DrivingScreen(
     // Layout coordinates
     pauseX: Float = 0.90f,
     pauseY: Float = 0.08f,
+    pauseScale: Float = 1.0f,
     camX: Float = 0.80f,
     camY: Float = 0.08f,
+    camScale: Float = 1.0f,
     lightsX: Float = 0.70f,
     lightsY: Float = 0.08f,
+    lightsScale: Float = 1.0f,
     gearDownX: Float = 0.38f,
     gearDownY: Float = 0.90f,
+    gearDownScale: Float = 1.0f,
     handbrakeX: Float = 0.50f,
     handbrakeY: Float = 0.90f,
+    handbrakeScale: Float = 1.0f,
     gearUpX: Float = 0.62f,
     gearUpY: Float = 0.90f,
+    gearUpScale: Float = 1.0f,
     radioX: Float = 0.88f,
     radioY: Float = 0.50f,
+    radioScale: Float = 1.0f,
 
     onPauseClick: () -> Unit = {},
     onCamClick: () -> Unit = {},
@@ -66,14 +74,14 @@ fun DrivingScreen(
     onGearUpChange: (Boolean) -> Unit = {},
     onRadioClick: () -> Unit = {},
     onSaveLayout: (
-        pauseX: Float, pauseY: Float,
-        camX: Float, camY: Float,
-        lightsX: Float, lightsY: Float,
-        gearDownX: Float, gearDownY: Float,
-        handbrakeX: Float, handbrakeY: Float,
-        gearUpX: Float, gearUpY: Float,
-        radioX: Float, radioY: Float
-    ) -> Unit = { _,_, _,_, _,_, _,_, _,_, _,_, _,_ -> },
+        pauseX: Float, pauseY: Float, pauseScale: Float,
+        camX: Float, camY: Float, camScale: Float,
+        lightsX: Float, lightsY: Float, lightsScale: Float,
+        gearDownX: Float, gearDownY: Float, gearDownScale: Float,
+        handbrakeX: Float, handbrakeY: Float, handbrakeScale: Float,
+        gearUpX: Float, gearUpY: Float, gearUpScale: Float,
+        radioX: Float, radioY: Float, radioScale: Float
+    ) -> Unit = { _,_,_, _,_,_, _,_,_, _,_,_, _,_,_, _,_,_, _,_,_ -> },
     onBrakeDiagnostics: (PedalDiagnostics) -> Unit = {},
     onThrottleDiagnostics: (PedalDiagnostics) -> Unit = {}
 ) {
@@ -99,6 +107,14 @@ fun DrivingScreen(
     var gearUpPos by remember(gearUpX, gearUpY) { mutableStateOf(Offset(gearUpX, gearUpY)) }
     var radioPos by remember(radioX, radioY) { mutableStateOf(Offset(radioX, radioY)) }
 
+    var pauseS by remember(pauseScale) { mutableFloatStateOf(pauseScale) }
+    var camS by remember(camScale) { mutableFloatStateOf(camScale) }
+    var lightsS by remember(lightsScale) { mutableFloatStateOf(lightsScale) }
+    var gearDownS by remember(gearDownScale) { mutableFloatStateOf(gearDownScale) }
+    var handbrakeS by remember(handbrakeScale) { mutableFloatStateOf(handbrakeScale) }
+    var gearUpS by remember(gearUpScale) { mutableFloatStateOf(gearUpScale) }
+    var radioS by remember(radioScale) { mutableFloatStateOf(radioScale) }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -108,40 +124,85 @@ fun DrivingScreen(
         val screenHeightPx = constraints.maxHeight.toFloat()
         val density = LocalDensity.current
 
-        // Helper to position and make elements draggable
+        // Layout Editor Composable Container to handle position, drag, resize, and scale
         @Composable
-        fun getModifierForButton(
+        fun LayoutEditorItem(
             position: Offset,
-            buttonWidthDp: Int,
-            buttonHeightDp: Int,
-            onPositionChanged: (Offset) -> Unit
-        ): Modifier {
-            val currentPosition by rememberUpdatedState(position)
-            val currentOnPositionChanged by rememberUpdatedState(onPositionChanged)
+            baseWidthDp: Int,
+            baseHeightDp: Int,
+            scale: Float,
+            onPositionChanged: (Offset) -> Unit,
+            onScaleChanged: (Float) -> Unit,
+            content: @Composable () -> Unit
+        ) {
             val xDp = with(density) { (position.x * screenWidthPx).toDp() }
             val yDp = with(density) { (position.y * screenHeightPx).toDp() }
-            
-            return Modifier
-                .offset(
-                    x = xDp - (buttonWidthDp / 2).dp,
-                    y = yDp - (buttonHeightDp / 2).dp
-                )
-                .pointerInput(isEditingLayout) {
-                    if (!isEditingLayout) return@pointerInput
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        val newX = (currentPosition.x + dragAmount.x / screenWidthPx).coerceIn(0.02f, 0.98f)
-                        val newY = (currentPosition.y + dragAmount.y / screenHeightPx).coerceIn(0.02f, 0.98f)
-                        currentOnPositionChanged(Offset(newX, newY))
+            val buttonWidthDp = (baseWidthDp * scale).dp
+            val buttonHeightDp = (baseHeightDp * scale).dp
+
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = xDp - buttonWidthDp / 2,
+                        y = yDp - buttonHeightDp / 2
+                    )
+                    .size(width = buttonWidthDp, height = buttonHeightDp)
+                    .pointerInput(isEditingLayout) {
+                        if (!isEditingLayout) return@pointerInput
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            val newX = (position.x + dragAmount.x / screenWidthPx).coerceIn(0.02f, 0.98f)
+                            val newY = (position.y + dragAmount.y / screenHeightPx).coerceIn(0.02f, 0.98f)
+                            onPositionChanged(Offset(newX, newY))
+                        }
+                    }
+                    .then(
+                        if (isEditingLayout) {
+                            Modifier.border(1.5.dp, AccentYellow, RoundedCornerShape(8.dp))
+                        } else {
+                            Modifier
+                        }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                content()
+
+                if (isEditingLayout) {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .offset(y = (-24).dp)
+                            .background(CarbonDark.copy(alpha = 0.85f), RoundedCornerShape(4.dp))
+                            .border(0.5.dp, AccentYellow, RoundedCornerShape(4.dp))
+                            .padding(horizontal = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { onScaleChanged((scale - 0.1f).coerceIn(0.5f, 2.0f)) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("-", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Text(
+                            text = String.format(Locale.US, "%.1fx", scale),
+                            color = AccentYellow,
+                            fontSize = 8.sp,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { onScaleChanged((scale + 0.1f).coerceIn(0.5f, 2.0f)) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("+", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
-                .then(
-                    if (isEditingLayout) {
-                        Modifier.border(1.5.dp, AccentYellow, RoundedCornerShape(8.dp))
-                    } else {
-                        Modifier
-                    }
-                )
+            }
         }
 
         // ==========================================
@@ -203,13 +264,13 @@ fun DrivingScreen(
                     onClick = {
                         isEditingLayout = false
                         onSaveLayout(
-                            pausePos.x, pausePos.y,
-                            camPos.x, camPos.y,
-                            lightsPos.x, lightsPos.y,
-                            gearDownPos.x, gearDownPos.y,
-                            handbrakePos.x, handbrakePos.y,
-                            gearUpPos.x, gearUpPos.y,
-                            radioPos.x, radioPos.y
+                            pausePos.x, pausePos.y, pauseS,
+                            camPos.x, camPos.y, camS,
+                            lightsPos.x, lightsPos.y, lightsS,
+                            gearDownPos.x, gearDownPos.y, gearDownS,
+                            handbrakePos.x, handbrakePos.y, handbrakeS,
+                            gearUpPos.x, gearUpPos.y, gearUpS,
+                            radioPos.x, radioPos.y, radioS
                         )
                     },
                     color = ThrottleGreen
@@ -220,106 +281,118 @@ fun DrivingScreen(
         }
 
         // ==========================================
-        // 3. DRAGGABLE VIRTUAL BUTTONS
+        // 3. DRAGGABLE & RESIZEABLE VIRTUAL BUTTONS
         // ==========================================
 
         // PAUSE Button
-        Box(
-            modifier = getModifierForButton(
-                position = pausePos,
-                buttonWidthDp = 68,
-                buttonHeightDp = 42,
-                onPositionChanged = { pausePos = it }
-            )
+        LayoutEditorItem(
+            position = pausePos,
+            baseWidthDp = 68,
+            baseHeightDp = 42,
+            scale = pauseS,
+            onPositionChanged = { pausePos = it },
+            onScaleChanged = { pauseS = it }
         ) {
-            HudButton(label = "Pause", onClick = { if (!isEditingLayout) onPauseClick() })
+            HudButton(
+                label = "Pause",
+                modifier = Modifier.fillMaxSize(),
+                onClick = { if (!isEditingLayout) onPauseClick() }
+            )
         }
 
         // CAM Button
-        Box(
-            modifier = getModifierForButton(
-                position = camPos,
-                buttonWidthDp = 68,
-                buttonHeightDp = 42,
-                onPositionChanged = { camPos = it }
-            )
+        LayoutEditorItem(
+            position = camPos,
+            baseWidthDp = 68,
+            baseHeightDp = 42,
+            scale = camS,
+            onPositionChanged = { camPos = it },
+            onScaleChanged = { camS = it }
         ) {
-            HudButton(label = "Cam", onClick = { if (!isEditingLayout) onCamClick() })
+            HudButton(
+                label = "Cam",
+                modifier = Modifier.fillMaxSize(),
+                onClick = { if (!isEditingLayout) onCamClick() }
+            )
         }
 
         // LIGHTS Button
-        Box(
-            modifier = getModifierForButton(
-                position = lightsPos,
-                buttonWidthDp = 68,
-                buttonHeightDp = 42,
-                onPositionChanged = { lightsPos = it }
-            )
+        LayoutEditorItem(
+            position = lightsPos,
+            baseWidthDp = 68,
+            baseHeightDp = 42,
+            scale = lightsS,
+            onPositionChanged = { lightsPos = it },
+            onScaleChanged = { lightsS = it }
         ) {
-            HudButton(label = "Lights", onClick = { if (!isEditingLayout) onLightsClick() })
+            HudButton(
+                label = "Lights",
+                modifier = Modifier.fillMaxSize(),
+                onClick = { if (!isEditingLayout) onLightsClick() }
+            )
         }
 
         // GEAR DOWN Button
-        Box(
-            modifier = getModifierForButton(
-                position = gearDownPos,
-                buttonWidthDp = 64,
-                buttonHeightDp = 42,
-                onPositionChanged = { gearDownPos = it }
-            )
+        LayoutEditorItem(
+            position = gearDownPos,
+            baseWidthDp = 64,
+            baseHeightDp = 42,
+            scale = gearDownS,
+            onPositionChanged = { gearDownPos = it },
+            onScaleChanged = { gearDownS = it }
         ) {
             RacingButton(
                 text = "GEAR-",
-                modifier = Modifier.width(64.dp),
+                modifier = Modifier.fillMaxSize(),
                 onPressedChange = { if (!isEditingLayout) onGearDownChange(it) }
             ) {}
         }
 
         // HANDBRAKE Button
-        Box(
-            modifier = getModifierForButton(
-                position = handbrakePos,
-                buttonWidthDp = 70,
-                buttonHeightDp = 42,
-                onPositionChanged = { handbrakePos = it }
-            )
+        LayoutEditorItem(
+            position = handbrakePos,
+            baseWidthDp = 70,
+            baseHeightDp = 42,
+            scale = handbrakeS,
+            onPositionChanged = { handbrakePos = it },
+            onScaleChanged = { handbrakeS = it }
         ) {
             RacingButton(
                 text = "HBRAKE",
-                modifier = Modifier.width(70.dp),
+                modifier = Modifier.fillMaxSize(),
                 onPressedChange = { if (!isEditingLayout) onHandbrakeChange(it) }
             ) {}
         }
 
         // GEAR UP Button
-        Box(
-            modifier = getModifierForButton(
-                position = gearUpPos,
-                buttonWidthDp = 64,
-                buttonHeightDp = 42,
-                onPositionChanged = { gearUpPos = it }
-            )
+        LayoutEditorItem(
+            position = gearUpPos,
+            baseWidthDp = 64,
+            baseHeightDp = 42,
+            scale = gearUpS,
+            onPositionChanged = { gearUpPos = it },
+            onScaleChanged = { gearUpS = it }
         ) {
             RacingButton(
                 text = "GEAR+",
-                modifier = Modifier.width(64.dp),
+                modifier = Modifier.fillMaxSize(),
                 onPressedChange = { if (!isEditingLayout) onGearUpChange(it) }
             ) {}
         }
 
         // RADIO Button
         if (showRadio) {
-            Box(
-                modifier = getModifierForButton(
-                    position = radioPos,
-                    buttonWidthDp = 80,
-                    buttonHeightDp = 42,
-                    onPositionChanged = { radioPos = it }
-                )
+            LayoutEditorItem(
+                position = radioPos,
+                baseWidthDp = 80,
+                baseHeightDp = 42,
+                scale = radioS,
+                onPositionChanged = { radioPos = it },
+                onScaleChanged = { radioS = it }
             ) {
                 RacingButton(
                     text = "📻 RADIO",
-                    modifier = Modifier.width(80.dp),
+                    modifier = Modifier.fillMaxSize(),
                     onClick = { if (!isEditingLayout) onRadioClick() }
                 )
             }

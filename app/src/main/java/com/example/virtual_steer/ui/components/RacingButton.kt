@@ -35,7 +35,7 @@ fun RacingButton(
 
     Box(
         modifier = modifier
-            .height(42.dp)
+            .defaultMinSize(minHeight = 42.dp)
             .clip(RoundedCornerShape(6.dp))
             .background(
                 if (isPressed) AccentYellow.copy(alpha = 0.2f) else GridPanelBg

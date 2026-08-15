@@ -96,11 +96,14 @@ class UDPClient(
         Log.d(TAG, "Disconnected")
     }
 
+    private val stateChannel = kotlinx.coroutines.channels.Channel<ControllerState>(kotlinx.coroutines.channels.Channel.CONFLATED)
+
     /**
      * Update the latest state to be sent in the next transmission cycle.
      */
     fun updateControllerState(state: ControllerState) {
         latestState.set(state)
+        stateChannel.trySend(state)
     }
 
     private fun restartSenderLoop() {
@@ -109,76 +112,58 @@ class UDPClient(
     }
 
     private fun startSenderLoop() {
-        val intervalNs = 1_000_000_000L / config.get().packetRate.coerceAtLeast(1)
-        
         senderJob = scope.launch(Dispatchers.IO) {
-            var lastHeartbeat = 0L
+            var lastHeartbeat = System.currentTimeMillis()
             var packetsSent = 0L
             var rateWindowStart = System.currentTimeMillis()
             var packetsInWindow = 0
-            
-            var nextSendTimeNs = System.nanoTime()
-            
-            while (isActive) {
-                val state = latestState.get()
-                val addr = targetAddress.get()
-                val port = targetPort.get()
-                val currentConfig = config.get()
 
-                if (addr != null) {
+            // Heartbeat worker to periodically send heartbeats if no events are active
+            val heartbeatJob = launch {
+                while (isActive) {
+                    delay(200) // Poll for heartbeat status every 200ms
+                    val now = System.currentTimeMillis()
+                    val currentConfig = config.get()
+                    if (now - lastHeartbeat >= currentConfig.heartbeatInterval) {
+                        val state = latestState.get() ?: ControllerState()
+                        stateChannel.trySend(state)
+                    }
+                }
+            }
+
+            try {
+                for (state in stateChannel) {
+                    val addr = targetAddress.get() ?: continue
+                    val port = targetPort.get()
+
                     try {
+                        val data = serializer.serialize(state)
+                        val packet = DatagramPacket(data, data.size, addr, port)
+                        socket?.send(packet)
+                        _lastPacket.value = data
+
                         val now = System.currentTimeMillis()
-                        val shouldSendState = state != null
-                        val shouldSendHeartbeat = now - lastHeartbeat >= currentConfig.heartbeatInterval
+                        lastHeartbeat = now
+                        packetsSent++
+                        packetsInWindow++
 
-                        if (shouldSendState || shouldSendHeartbeat) {
-                            val data = serializer.serialize(state ?: ControllerState())
-                            val packet = DatagramPacket(data, data.size, addr, port)
-                            socket?.send(packet)
-                            _lastPacket.value = data
-                            packetsSent++
-                            packetsInWindow++
-                            
-                            if (shouldSendHeartbeat) {
-                                lastHeartbeat = now
-                            }
-
-                            if (now - rateWindowStart >= 1000L) {
-                                _diagnostics.value = _diagnostics.value.copy(
-                                    connected = true,
-                                    targetIp = addr.hostAddress ?: "N/A",
-                                    port = port,
-                                    packetRate = packetsInWindow,
-                                    packetsSent = packetsSent
-                                )
-                                packetsInWindow = 0
-                                rateWindowStart = now
-                            }
+                        if (now - rateWindowStart >= 1000L) {
+                            _diagnostics.value = _diagnostics.value.copy(
+                                connected = true,
+                                targetIp = addr.hostAddress ?: "N/A",
+                                port = port,
+                                packetRate = packetsInWindow,
+                                packetsSent = packetsSent
+                            )
+                            packetsInWindow = 0
+                            rateWindowStart = now
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Transmission error", e)
                     }
                 }
-                
-                // Schedule next send tick and sleep with nano-precision
-                nextSendTimeNs += intervalNs
-                val nowNs = System.nanoTime()
-                val sleepTimeNs = nextSendTimeNs - nowNs
-                if (sleepTimeNs > 0) {
-                    val sleepMs = sleepTimeNs / 1_000_000L
-                    val sleepNs = (sleepTimeNs % 1_000_000L).toInt()
-                    try {
-                        Thread.sleep(sleepMs, sleepNs)
-                    } catch (e: InterruptedException) {
-                        break
-                    }
-                } else {
-                    // Running behind, yield thread and re-align timing anchor if falling too far behind (50ms)
-                    Thread.yield()
-                    if (nowNs - nextSendTimeNs > 50_000_000L) {
-                        nextSendTimeNs = nowNs
-                    }
-                }
+            } finally {
+                heartbeatJob.cancel()
             }
         }
     }
