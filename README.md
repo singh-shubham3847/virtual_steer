@@ -6,8 +6,11 @@ Virtual Steer is an ultra-low latency, high-precision virtual steering wheel con
 
 ## ⚡ Core Features & Recent Upgrades
 
+* **📺 Immersive Full-Screen Mode:** Automatically hides the status bar and system navigation buttons, maximizing driving screen real estate and preventing accidental touches.
+* **📐 Two-Column Landscape Layout:** Reorganized the Pairing/Connection screen to natively leverage landscape screens, putting brand/USB status on the left and available receivers on the right. Removed the redundant manual IP connection bar to keep the UI clean.
+* **🔌 Connection Type Classification:** Detects and displays whether a receiver PC is found via a **USB** tethered connection or **WI-FI** using local interface subnet matching.
+* **⚡ Stuck Pedal Prevention:** Fixed touch gestures (via `awaitEachGesture` with `finally` block cleanup) and bypassed engine-side low-pass smoothing on release to ensure throttle and brake values instantly drop to zero without getting stuck.
 * **🎮 Drag-and-Drop Layout Editor:** Fully customizable button positioning. Tap **"Adjust Button Positions"** in Settings to enter edit mode, drag buttons (`Pause`, `Cam`, `Lights`, `GEAR-`, `HBRAKE`, `GEAR+`, and `📻 RADIO`) anywhere on the screen, and click **"Save & Exit"** to persist your layout.
-* **📏 135° Steering Limits:** Reconfigured default handling sensitivity to map to 135° steering by default for optimal control.
 * **📻 Compact Radio Channel Control:** Includes a dedicated, compact `📻 RADIO` station button that cycles channels by pulsing `DpadRight` (standard radio button for NFS, Forza, and GTA V).
 * **🔋 Live Battery Tracking:** Direct integration with Android's `BatteryManager` service to display real-time mobile battery status on the main dashboard and diagnostics.
 * **⚙️ Detailed Pedals & Sensor Settings:**
@@ -15,7 +18,6 @@ Virtual Steer is an ultra-low latency, high-precision virtual steering wheel con
   * **Sensor Source Selection:** Choose between **Rotation Vector** (Gyroscope-assisted sensor fusion) or **Accelerometer** (Gravity tilt roll fallback for budget devices).
 * **🧹 Clutter-Free UI:** Hidden layout adjustments, steering angles, and detailed latency metrics from the main driving HUD to keep focus purely on the road.
 * **🏎️ Zero-Configuration Auto-Discovery:** Broadcasting UDP packets find your PC receiver instantly on local Wi-Fi or when using **Android Hotspot**.
-* **🔌 Wired USB Connection (Tethering):** Cuts ping response latency to <1ms and guarantees zero packet loss. Includes a direct shortcut in the Pairing/Settings menu to launch the system Tethering settings in one tap.
 
 ---
 
