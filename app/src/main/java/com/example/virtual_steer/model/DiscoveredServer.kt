@@ -4,5 +4,6 @@ data class DiscoveredServer(
     val ip: String,
     val port: Int,
     val name: String,
-    val lastSeen: Long = System.currentTimeMillis()
+    val lastSeen: Long = System.currentTimeMillis(),
+    val connectionType: String = "Wi-Fi"
 )

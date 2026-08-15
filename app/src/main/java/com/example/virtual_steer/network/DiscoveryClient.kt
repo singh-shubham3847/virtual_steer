@@ -110,16 +110,17 @@ class DiscoveryClient(
                     Log.d(TAG, "Received discovery reply from $senderIp: $message")
 
                     try {
+                        val connType = getInterfaceTypeForIp(senderIp)
                         if (message.startsWith("{")) {
                             // Try JSON parsing
                             val response = json.decodeFromString<DiscoveryResponse>(message)
-                            onServerFound(DiscoveredServer(senderIp, response.port, response.hostname))
+                            onServerFound(DiscoveredServer(senderIp, response.port, response.hostname, connectionType = connType))
                         } else if (message.startsWith("VIRTUAL_STEER_SERVER:")) {
                             // Try legacy string parsing
                             val parts = message.split(":")
                             val serverPort = parts.getOrNull(1)?.toIntOrNull() ?: 4444
                             val serverName = parts.getOrNull(2) ?: "Unknown PC"
-                            onServerFound(DiscoveredServer(senderIp, serverPort, serverName))
+                            onServerFound(DiscoveredServer(senderIp, serverPort, serverName, connectionType = connType))
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to parse discovery message", e)
@@ -133,6 +134,60 @@ class DiscoveryClient(
                 socket?.close()
             }
         }
+    }
+
+    private fun getInterfaceTypeForIp(ipAddress: String): String {
+        try {
+            val targetIp = InetAddress.getByName(ipAddress)
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
+            if (interfaces != null) {
+                for (netInterface in java.util.Collections.list(interfaces)) {
+                    if (netInterface.isLoopback || !netInterface.isUp) continue
+                    for (interfaceAddress in netInterface.interfaceAddresses) {
+                        val localIp = interfaceAddress.address
+                        val prefixLength = interfaceAddress.networkPrefixLength
+                        if (isInSameSubnet(localIp, targetIp, prefixLength)) {
+                            val name = netInterface.name.lowercase()
+                            return if (name.contains("rndis") || name.contains("usb")) {
+                                "USB"
+                            } else {
+                                "Wi-Fi"
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to determine interface type", e)
+        }
+        // Fallback based on typical USB tethering subnets if subnet matching failed
+        if (ipAddress.startsWith("192.168.42.")) {
+            return "USB"
+        }
+        return "Wi-Fi"
+    }
+
+    private fun isInSameSubnet(ip1: InetAddress, ip2: InetAddress, prefixLength: Short): Boolean {
+        val bytes1 = ip1.address
+        val bytes2 = ip2.address
+        if (bytes1.size != bytes2.size) return false
+        
+        val bits = prefixLength.toInt()
+        val bytesToCheck = bits / 8
+        val remainingBits = bits % 8
+        
+        for (i in 0 until bytesToCheck) {
+            if (bytes1[i] != bytes2[i]) return false
+        }
+        
+        if (remainingBits > 0) {
+            val mask = (0xFF00 shr remainingBits).toByte()
+            if ((bytes1[bytesToCheck].toInt() and mask.toInt()) != (bytes2[bytesToCheck].toInt() and mask.toInt())) {
+                return false
+            }
+        }
+        
+        return true
     }
 
     fun stop() {
