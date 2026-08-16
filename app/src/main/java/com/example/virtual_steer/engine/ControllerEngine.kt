@@ -55,59 +55,88 @@ class ControllerEngine {
         _diagnostics.update { it.copy(network = network) }
     }
 
+    private val lastPressTimes = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    private val BUTTON_COOLDOWN_MS = 250L
+
+    private fun checkCooldown(key: String, value: Boolean): Boolean {
+        if (value) {
+            val now = System.currentTimeMillis()
+            val last = lastPressTimes[key] ?: 0L
+            if (now - last < BUTTON_COOLDOWN_MS) {
+                return false
+            }
+            lastPressTimes[key] = now
+        }
+        return true
+    }
+
     fun updateHandbrake(value: Boolean) {
+        if (!checkCooldown("handbrake", value)) return
         _controllerState.update { it.copy(handbrake = value) }
     }
 
     fun updateGearUp(value: Boolean) {
+        if (!checkCooldown("gearUp", value)) return
         _controllerState.update { it.copy(gearUp = value) }
     }
 
     fun updateGearDown(value: Boolean) {
+        if (!checkCooldown("gearDown", value)) return
         _controllerState.update { it.copy(gearDown = value) }
     }
 
     fun updatePause(value: Boolean) {
+        if (!checkCooldown("pause", value)) return
         _controllerState.update { it.copy(pause = value) }
     }
 
     fun updateHorn(value: Boolean) {
+        if (!checkCooldown("horn", value)) return
         _controllerState.update { it.copy(horn = value) }
     }
 
     fun updateHeadlights(value: Boolean) {
+        if (!checkCooldown("headlights", value)) return
         _controllerState.update { it.copy(headlights = value) }
     }
 
     fun updateCamera(value: Boolean) {
+        if (!checkCooldown("camera", value)) return
         _controllerState.update { it.copy(camera = value) }
     }
 
     fun updateDpadUp(value: Boolean) {
+        if (!checkCooldown("dpadUp", value)) return
         _controllerState.update { it.copy(dpadUp = value) }
     }
 
     fun updateDpadDown(value: Boolean) {
+        if (!checkCooldown("dpadDown", value)) return
         _controllerState.update { it.copy(dpadDown = value) }
     }
 
     fun updateDpadLeft(value: Boolean) {
+        if (!checkCooldown("dpadLeft", value)) return
         _controllerState.update { it.copy(dpadLeft = value) }
     }
 
     fun updateDpadRight(value: Boolean) {
+        if (!checkCooldown("dpadRight", value)) return
         _controllerState.update { it.copy(dpadRight = value) }
     }
 
     fun updateLb(value: Boolean) {
+        if (!checkCooldown("lb", value)) return
         _controllerState.update { it.copy(lb = value) }
     }
 
     fun updateRb(value: Boolean) {
+        if (!checkCooldown("rb", value)) return
         _controllerState.update { it.copy(rb = value) }
     }
 
     fun updateBack(value: Boolean) {
+        if (!checkCooldown("back", value)) return
         _controllerState.update { it.copy(back = value) }
     }
 
