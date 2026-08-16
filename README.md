@@ -6,11 +6,11 @@ Virtual Steer is an ultra-low latency, high-precision virtual steering wheel con
 
 ## ⚡ Core Features & Recent Upgrades
 
+* **📐 4-Point Edge Reshaping & Drag Editor:** Symmetrical resizing and reshaping handles (yellow anchors on Left, Right, Top, and Bottom edges) to stretch button width and height independently. Layout positions and aspect ratios are saved to DataStore configuration.
+* **🏎️ Discrete High-Frequency Latency Settings:** Toggle snapped packet rate options: `Event-Driven (Low CPU)` (which suspends thread when idle and sends instantly on changes for ~0ms latency), `50Hz`, `100Hz`, `200Hz`, `600Hz (High Freq)`, and `1000Hz (Ultra Freq)` for pro-gaming sub-millisecond input feeding.
 * **📺 Immersive Full-Screen Mode:** Automatically hides the status bar and system navigation buttons, maximizing driving screen real estate and preventing accidental touches.
-* **📐 Two-Column Landscape Layout:** Reorganized the Pairing/Connection screen to natively leverage landscape screens, putting brand/USB status on the left and available receivers on the right. Removed the redundant manual IP connection bar to keep the UI clean.
 * **🔌 Connection Type Classification:** Detects and displays whether a receiver PC is found via a **USB** tethered connection or **WI-FI** using local interface subnet matching.
 * **⚡ Stuck Pedal Prevention:** Fixed touch gestures (via `awaitEachGesture` with `finally` block cleanup) and bypassed engine-side low-pass smoothing on release to ensure throttle and brake values instantly drop to zero without getting stuck.
-* **🎮 Drag-and-Drop Layout Editor:** Fully customizable button positioning. Tap **"Adjust Button Positions"** in Settings to enter edit mode, drag buttons (`Pause`, `Cam`, `Lights`, `GEAR-`, `HBRAKE`, `GEAR+`, and `📻 RADIO`) anywhere on the screen, and click **"Save & Exit"** to persist your layout.
 * **📻 Compact Radio Channel Control:** Includes a dedicated, compact `📻 RADIO` station button that cycles channels by pulsing `DpadRight` (standard radio button for NFS, Forza, and GTA V).
 * **🔋 Live Battery Tracking:** Direct integration with Android's `BatteryManager` service to display real-time mobile battery status on the main dashboard and diagnostics.
 * **⚙️ Detailed Pedals & Sensor Settings:**
