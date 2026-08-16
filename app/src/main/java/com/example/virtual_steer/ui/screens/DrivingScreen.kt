@@ -8,9 +8,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,25 +45,32 @@ fun DrivingScreen(
     // Layout coordinates
     pauseX: Float = 0.90f,
     pauseY: Float = 0.08f,
-    pauseScale: Float = 1.0f,
+    pauseScaleX: Float = 1.0f,
+    pauseScaleY: Float = 1.0f,
     camX: Float = 0.80f,
     camY: Float = 0.08f,
-    camScale: Float = 1.0f,
+    camScaleX: Float = 1.0f,
+    camScaleY: Float = 1.0f,
     lightsX: Float = 0.70f,
     lightsY: Float = 0.08f,
-    lightsScale: Float = 1.0f,
+    lightsScaleX: Float = 1.0f,
+    lightsScaleY: Float = 1.0f,
     gearDownX: Float = 0.38f,
     gearDownY: Float = 0.90f,
-    gearDownScale: Float = 1.0f,
+    gearDownScaleX: Float = 1.0f,
+    gearDownScaleY: Float = 1.0f,
     handbrakeX: Float = 0.50f,
     handbrakeY: Float = 0.90f,
-    handbrakeScale: Float = 1.0f,
+    handbrakeScaleX: Float = 1.0f,
+    handbrakeScaleY: Float = 1.0f,
     gearUpX: Float = 0.62f,
     gearUpY: Float = 0.90f,
-    gearUpScale: Float = 1.0f,
+    gearUpScaleX: Float = 1.0f,
+    gearUpScaleY: Float = 1.0f,
     radioX: Float = 0.88f,
     radioY: Float = 0.50f,
-    radioScale: Float = 1.0f,
+    radioScaleX: Float = 1.0f,
+    radioScaleY: Float = 1.0f,
 
     onPauseClick: () -> Unit = {},
     onCamClick: () -> Unit = {},
@@ -74,14 +83,14 @@ fun DrivingScreen(
     onGearUpChange: (Boolean) -> Unit = {},
     onRadioClick: () -> Unit = {},
     onSaveLayout: (
-        pauseX: Float, pauseY: Float, pauseScale: Float,
-        camX: Float, camY: Float, camScale: Float,
-        lightsX: Float, lightsY: Float, lightsScale: Float,
-        gearDownX: Float, gearDownY: Float, gearDownScale: Float,
-        handbrakeX: Float, handbrakeY: Float, handbrakeScale: Float,
-        gearUpX: Float, gearUpY: Float, gearUpScale: Float,
-        radioX: Float, radioY: Float, radioScale: Float
-    ) -> Unit = { _,_,_, _,_,_, _,_,_, _,_,_, _,_,_, _,_,_, _,_,_ -> },
+        pauseX: Float, pauseY: Float, pauseScaleX: Float, pauseScaleY: Float,
+        camX: Float, camY: Float, camScaleX: Float, camScaleY: Float,
+        lightsX: Float, lightsY: Float, lightsScaleX: Float, lightsScaleY: Float,
+        gearDownX: Float, gearDownY: Float, gearDownScaleX: Float, gearDownScaleY: Float,
+        handbrakeX: Float, handbrakeY: Float, handbrakeScaleX: Float, handbrakeScaleY: Float,
+        gearUpX: Float, gearUpY: Float, gearUpScaleX: Float, gearUpScaleY: Float,
+        radioX: Float, radioY: Float, radioScaleX: Float, radioScaleY: Float
+    ) -> Unit = { _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_ -> },
     onBrakeDiagnostics: (PedalDiagnostics) -> Unit = {},
     onThrottleDiagnostics: (PedalDiagnostics) -> Unit = {}
 ) {
@@ -107,13 +116,20 @@ fun DrivingScreen(
     var gearUpPos by remember(gearUpX, gearUpY) { mutableStateOf(Offset(gearUpX, gearUpY)) }
     var radioPos by remember(radioX, radioY) { mutableStateOf(Offset(radioX, radioY)) }
 
-    var pauseS by remember(pauseScale) { mutableFloatStateOf(pauseScale) }
-    var camS by remember(camScale) { mutableFloatStateOf(camScale) }
-    var lightsS by remember(lightsScale) { mutableFloatStateOf(lightsScale) }
-    var gearDownS by remember(gearDownScale) { mutableFloatStateOf(gearDownScale) }
-    var handbrakeS by remember(handbrakeScale) { mutableFloatStateOf(handbrakeScale) }
-    var gearUpS by remember(gearUpScale) { mutableFloatStateOf(gearUpScale) }
-    var radioS by remember(radioScale) { mutableFloatStateOf(radioScale) }
+    var pauseSX by remember(pauseScaleX) { mutableFloatStateOf(pauseScaleX) }
+    var pauseSY by remember(pauseScaleY) { mutableFloatStateOf(pauseScaleY) }
+    var camSX by remember(camScaleX) { mutableFloatStateOf(camScaleX) }
+    var camSY by remember(camScaleY) { mutableFloatStateOf(camScaleY) }
+    var lightsSX by remember(lightsScaleX) { mutableFloatStateOf(lightsScaleX) }
+    var lightsSY by remember(lightsScaleY) { mutableFloatStateOf(lightsScaleY) }
+    var gearDownSX by remember(gearDownScaleX) { mutableFloatStateOf(gearDownScaleX) }
+    var gearDownSY by remember(gearDownScaleY) { mutableFloatStateOf(gearDownScaleY) }
+    var handbrakeSX by remember(handbrakeScaleX) { mutableFloatStateOf(handbrakeScaleX) }
+    var handbrakeSY by remember(handbrakeScaleY) { mutableFloatStateOf(handbrakeScaleY) }
+    var gearUpSX by remember(gearUpScaleX) { mutableFloatStateOf(gearUpScaleX) }
+    var gearUpSY by remember(gearUpScaleY) { mutableFloatStateOf(gearUpScaleY) }
+    var radioSX by remember(radioScaleX) { mutableFloatStateOf(radioScaleX) }
+    var radioSY by remember(radioScaleY) { mutableFloatStateOf(radioScaleY) }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -130,15 +146,24 @@ fun DrivingScreen(
             position: Offset,
             baseWidthDp: Int,
             baseHeightDp: Int,
-            scale: Float,
+            scaleX: Float,
+            scaleY: Float,
             onPositionChanged: (Offset) -> Unit,
-            onScaleChanged: (Float) -> Unit,
+            onScaleXChanged: (Float) -> Unit,
+            onScaleYChanged: (Float) -> Unit,
             content: @Composable () -> Unit
         ) {
-            val xDp = with(density) { (position.x * screenWidthPx).toDp() }
-            val yDp = with(density) { (position.y * screenHeightPx).toDp() }
-            val buttonWidthDp = (baseWidthDp * scale).dp
-            val buttonHeightDp = (baseHeightDp * scale).dp
+            val currentPosition by rememberUpdatedState(position)
+            val currentOnPositionChanged by rememberUpdatedState(onPositionChanged)
+            val currentScaleX by rememberUpdatedState(scaleX)
+            val currentOnScaleXChanged by rememberUpdatedState(onScaleXChanged)
+            val currentScaleY by rememberUpdatedState(scaleY)
+            val currentOnScaleYChanged by rememberUpdatedState(onScaleYChanged)
+
+            val xDp = with(density) { (currentPosition.x * screenWidthPx).toDp() }
+            val yDp = with(density) { (currentPosition.y * screenHeightPx).toDp() }
+            val buttonWidthDp = (baseWidthDp * scaleX).dp
+            val buttonHeightDp = (baseHeightDp * scaleY).dp
 
             Box(
                 modifier = Modifier
@@ -151,9 +176,9 @@ fun DrivingScreen(
                         if (!isEditingLayout) return@pointerInput
                         detectDragGestures { change, dragAmount ->
                             change.consume()
-                            val newX = (position.x + dragAmount.x / screenWidthPx).coerceIn(0.02f, 0.98f)
-                            val newY = (position.y + dragAmount.y / screenHeightPx).coerceIn(0.02f, 0.98f)
-                            onPositionChanged(Offset(newX, newY))
+                            val newX = (currentPosition.x + dragAmount.x / screenWidthPx).coerceIn(0.02f, 0.98f)
+                            val newY = (currentPosition.y + dragAmount.y / screenHeightPx).coerceIn(0.02f, 0.98f)
+                            currentOnPositionChanged(Offset(newX, newY))
                         }
                     }
                     .then(
@@ -168,39 +193,76 @@ fun DrivingScreen(
                 content()
 
                 if (isEditingLayout) {
-                    Row(
+                    val handleSize = 14.dp
+                    val handleColor = AccentYellow
+
+                    // LEFT Handle
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .offset(x = (-7).dp)
+                            .size(handleSize)
+                            .clip(CircleShape)
+                            .background(handleColor)
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consume()
+                                    val deltaScaleX = dragAmount.x / density.run { baseWidthDp.dp.toPx() }
+                                    currentOnScaleXChanged((currentScaleX - deltaScaleX).coerceIn(0.5f, 3.0f))
+                                }
+                            }
+                    )
+
+                    // RIGHT Handle
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .offset(x = 7.dp)
+                            .size(handleSize)
+                            .clip(CircleShape)
+                            .background(handleColor)
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consume()
+                                    val deltaScaleX = dragAmount.x / density.run { baseWidthDp.dp.toPx() }
+                                    currentOnScaleXChanged((currentScaleX + deltaScaleX).coerceIn(0.5f, 3.0f))
+                                }
+                            }
+                    )
+
+                    // TOP Handle
+                    Box(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .offset(y = (-24).dp)
-                            .background(CarbonDark.copy(alpha = 0.85f), RoundedCornerShape(4.dp))
-                            .border(0.5.dp, AccentYellow, RoundedCornerShape(4.dp))
-                            .padding(horizontal = 2.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .clickable { onScaleChanged((scale - 0.1f).coerceIn(0.5f, 2.0f)) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("-", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        }
-                        Text(
-                            text = String.format(Locale.US, "%.1fx", scale),
-                            color = AccentYellow,
-                            fontSize = 8.sp,
-                            fontFamily = FontFamily.Monospace
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .clickable { onScaleChanged((scale + 0.1f).coerceIn(0.5f, 2.0f)) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("+", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
+                            .offset(y = (-7).dp)
+                            .size(handleSize)
+                            .clip(CircleShape)
+                            .background(handleColor)
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consume()
+                                    val deltaScaleY = dragAmount.y / density.run { baseHeightDp.dp.toPx() }
+                                    currentOnScaleYChanged((currentScaleY - deltaScaleY).coerceIn(0.5f, 3.0f))
+                                }
+                            }
+                    )
+
+                    // BOTTOM Handle
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = 7.dp)
+                            .size(handleSize)
+                            .clip(CircleShape)
+                            .background(handleColor)
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consume()
+                                    val deltaScaleY = dragAmount.y / density.run { baseHeightDp.dp.toPx() }
+                                    currentOnScaleYChanged((currentScaleY + deltaScaleY).coerceIn(0.5f, 3.0f))
+                                }
+                            }
+                    )
                 }
             }
         }
@@ -264,13 +326,13 @@ fun DrivingScreen(
                     onClick = {
                         isEditingLayout = false
                         onSaveLayout(
-                            pausePos.x, pausePos.y, pauseS,
-                            camPos.x, camPos.y, camS,
-                            lightsPos.x, lightsPos.y, lightsS,
-                            gearDownPos.x, gearDownPos.y, gearDownS,
-                            handbrakePos.x, handbrakePos.y, handbrakeS,
-                            gearUpPos.x, gearUpPos.y, gearUpS,
-                            radioPos.x, radioPos.y, radioS
+                            pausePos.x, pausePos.y, pauseSX, pauseSY,
+                            camPos.x, camPos.y, camSX, camSY,
+                            lightsPos.x, lightsPos.y, lightsSX, lightsSY,
+                            gearDownPos.x, gearDownPos.y, gearDownSX, gearDownSY,
+                            handbrakePos.x, handbrakePos.y, handbrakeSX, handbrakeSY,
+                            gearUpPos.x, gearUpPos.y, gearUpSX, gearUpSY,
+                            radioPos.x, radioPos.y, radioSX, radioSY
                         )
                     },
                     color = ThrottleGreen
@@ -289,9 +351,11 @@ fun DrivingScreen(
             position = pausePos,
             baseWidthDp = 68,
             baseHeightDp = 42,
-            scale = pauseS,
+            scaleX = pauseSX,
+            scaleY = pauseSY,
             onPositionChanged = { pausePos = it },
-            onScaleChanged = { pauseS = it }
+            onScaleXChanged = { pauseSX = it },
+            onScaleYChanged = { pauseSY = it }
         ) {
             HudButton(
                 label = "Pause",
@@ -305,9 +369,11 @@ fun DrivingScreen(
             position = camPos,
             baseWidthDp = 68,
             baseHeightDp = 42,
-            scale = camS,
+            scaleX = camSX,
+            scaleY = camSY,
             onPositionChanged = { camPos = it },
-            onScaleChanged = { camS = it }
+            onScaleXChanged = { camSX = it },
+            onScaleYChanged = { camSY = it }
         ) {
             HudButton(
                 label = "Cam",
@@ -321,9 +387,11 @@ fun DrivingScreen(
             position = lightsPos,
             baseWidthDp = 68,
             baseHeightDp = 42,
-            scale = lightsS,
+            scaleX = lightsSX,
+            scaleY = lightsSY,
             onPositionChanged = { lightsPos = it },
-            onScaleChanged = { lightsS = it }
+            onScaleXChanged = { lightsSX = it },
+            onScaleYChanged = { lightsSY = it }
         ) {
             HudButton(
                 label = "Lights",
@@ -337,9 +405,11 @@ fun DrivingScreen(
             position = gearDownPos,
             baseWidthDp = 64,
             baseHeightDp = 42,
-            scale = gearDownS,
+            scaleX = gearDownSX,
+            scaleY = gearDownSY,
             onPositionChanged = { gearDownPos = it },
-            onScaleChanged = { gearDownS = it }
+            onScaleXChanged = { gearDownSX = it },
+            onScaleYChanged = { gearDownSY = it }
         ) {
             RacingButton(
                 text = "GEAR-",
@@ -353,9 +423,11 @@ fun DrivingScreen(
             position = handbrakePos,
             baseWidthDp = 70,
             baseHeightDp = 42,
-            scale = handbrakeS,
+            scaleX = handbrakeSX,
+            scaleY = handbrakeSY,
             onPositionChanged = { handbrakePos = it },
-            onScaleChanged = { handbrakeS = it }
+            onScaleXChanged = { handbrakeSX = it },
+            onScaleYChanged = { handbrakeSY = it }
         ) {
             RacingButton(
                 text = "HBRAKE",
@@ -369,9 +441,11 @@ fun DrivingScreen(
             position = gearUpPos,
             baseWidthDp = 64,
             baseHeightDp = 42,
-            scale = gearUpS,
+            scaleX = gearUpSX,
+            scaleY = gearUpSY,
             onPositionChanged = { gearUpPos = it },
-            onScaleChanged = { gearUpS = it }
+            onScaleXChanged = { gearUpSX = it },
+            onScaleYChanged = { gearUpSY = it }
         ) {
             RacingButton(
                 text = "GEAR+",
@@ -386,9 +460,11 @@ fun DrivingScreen(
                 position = radioPos,
                 baseWidthDp = 80,
                 baseHeightDp = 42,
-                scale = radioS,
+                scaleX = radioSX,
+                scaleY = radioSY,
                 onPositionChanged = { radioPos = it },
-                onScaleChanged = { radioS = it }
+                onScaleXChanged = { radioSX = it },
+                onScaleYChanged = { radioSY = it }
             ) {
                 RacingButton(
                     text = "📻 RADIO",
@@ -408,7 +484,7 @@ fun DrivingScreen(
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Text(
-                    text = "LAYOUT EDITOR ACTIVE: DRAG ANY BUTTON TO REARRANGE, THEN CLICK 'SAVE'",
+                    text = "DRAG HANDLES TO RESHAPE/RESIZE • DRAG CENTER TO MOVE BUTTON",
                     color = AccentYellow,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,

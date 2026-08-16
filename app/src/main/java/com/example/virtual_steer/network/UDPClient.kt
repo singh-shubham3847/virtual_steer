@@ -113,26 +113,72 @@ class UDPClient(
 
     private fun startSenderLoop() {
         senderJob = scope.launch(Dispatchers.IO) {
-            var lastHeartbeat = System.currentTimeMillis()
-            var packetsSent = 0L
-            var rateWindowStart = System.currentTimeMillis()
-            var packetsInWindow = 0
+            val currentConfig = config.get()
+            val rate = currentConfig.packetRate
 
-            // Heartbeat worker to periodically send heartbeats if no events are active
-            val heartbeatJob = launch {
-                while (isActive) {
-                    delay(200) // Poll for heartbeat status every 200ms
-                    val now = System.currentTimeMillis()
-                    val currentConfig = config.get()
-                    if (now - lastHeartbeat >= currentConfig.heartbeatInterval) {
-                        val state = latestState.get() ?: ControllerState()
-                        stateChannel.trySend(state)
+            if (rate <= 0) {
+                // Event-Driven Mode (Low CPU, sends immediately when inputs change)
+                var lastHeartbeat = System.currentTimeMillis()
+                var packetsSent = 0L
+                var rateWindowStart = System.currentTimeMillis()
+                var packetsInWindow = 0
+
+                val heartbeatJob = launch {
+                    while (isActive) {
+                        delay(200)
+                        val now = System.currentTimeMillis()
+                        val cfg = config.get()
+                        if (now - lastHeartbeat >= cfg.heartbeatInterval) {
+                            val state = latestState.get() ?: ControllerState()
+                            stateChannel.trySend(state)
+                        }
                     }
                 }
-            }
 
-            try {
-                for (state in stateChannel) {
+                try {
+                    for (state in stateChannel) {
+                        val addr = targetAddress.get() ?: continue
+                        val port = targetPort.get()
+
+                        try {
+                            val data = serializer.serialize(state)
+                            val packet = DatagramPacket(data, data.size, addr, port)
+                            socket?.send(packet)
+                            _lastPacket.value = data
+
+                            val now = System.currentTimeMillis()
+                            lastHeartbeat = now
+                            packetsSent++
+                            packetsInWindow++
+
+                            if (now - rateWindowStart >= 1000L) {
+                                _diagnostics.value = _diagnostics.value.copy(
+                                    connected = true,
+                                    targetIp = addr.hostAddress ?: "N/A",
+                                    port = port,
+                                    packetRate = packetsInWindow,
+                                    packetsSent = packetsSent
+                                )
+                                packetsInWindow = 0
+                                rateWindowStart = now
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Transmission error", e)
+                        }
+                    }
+                } finally {
+                    heartbeatJob.cancel()
+                }
+            } else {
+                // Constant High-Frequency Mode (e.g. 50, 100, 200, 600, 1000 Hz)
+                val intervalNs = 1_000_000_000L / rate
+                var nextSendTimeNs = System.nanoTime()
+                var packetsSent = 0L
+                var rateWindowStart = System.currentTimeMillis()
+                var packetsInWindow = 0
+
+                while (isActive) {
+                    val state = latestState.get() ?: ControllerState()
                     val addr = targetAddress.get() ?: continue
                     val port = targetPort.get()
 
@@ -142,18 +188,17 @@ class UDPClient(
                         socket?.send(packet)
                         _lastPacket.value = data
 
-                        val now = System.currentTimeMillis()
-                        lastHeartbeat = now
                         packetsSent++
                         packetsInWindow++
 
+                        val now = System.currentTimeMillis()
                         if (now - rateWindowStart >= 1000L) {
                             _diagnostics.value = _diagnostics.value.copy(
-                                connected = true,
-                                targetIp = addr.hostAddress ?: "N/A",
-                                port = port,
-                                packetRate = packetsInWindow,
-                                packetsSent = packetsSent
+                                  connected = true,
+                                  targetIp = addr.hostAddress ?: "N/A",
+                                  port = port,
+                                  packetRate = packetsInWindow,
+                                  packetsSent = packetsSent
                             )
                             packetsInWindow = 0
                             rateWindowStart = now
@@ -161,9 +206,26 @@ class UDPClient(
                     } catch (e: Exception) {
                         Log.e(TAG, "Transmission error", e)
                     }
+
+                    // Schedule next tick and sleep with nano-precision
+                    nextSendTimeNs += intervalNs
+                    val nowNs = System.nanoTime()
+                    val sleepTimeNs = nextSendTimeNs - nowNs
+                    if (sleepTimeNs > 0) {
+                        val sleepMs = sleepTimeNs / 1_000_000L
+                        val sleepNs = (sleepTimeNs % 1_000_000L).toInt()
+                        try {
+                            Thread.sleep(sleepMs, sleepNs)
+                        } catch (e: InterruptedException) {
+                            break
+                        }
+                    } else {
+                        // If lagging significantly, reset scheduling baseline to avoid packet storms
+                        if (nowNs - nextSendTimeNs > 5_000_000_000L) {
+                            nextSendTimeNs = nowNs
+                        }
+                    }
                 }
-            } finally {
-                heartbeatJob.cancel()
             }
         }
     }

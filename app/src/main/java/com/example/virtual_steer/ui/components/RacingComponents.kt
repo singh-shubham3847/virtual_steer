@@ -50,7 +50,8 @@ fun RacingSlider(
     value: Float,
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    displayValue: String = String.format("%.0f%%", value * 100)
+    displayValue: String = String.format("%.0f%%", value * 100),
+    steps: Int = 0
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(
@@ -76,6 +77,7 @@ fun RacingSlider(
             value = value,
             onValueChange = onValueChange,
             valueRange = valueRange,
+            steps = steps,
             colors = SliderDefaults.colors(
                 thumbColor = Color.White,
                 activeTrackColor = ThrottleGreen,

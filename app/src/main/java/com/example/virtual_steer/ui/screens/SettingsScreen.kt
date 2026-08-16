@@ -233,12 +233,25 @@ fun SettingsScreen(
                     )
                 }
                 
+                val rateOptions = listOf(0, 50, 100, 200, 600, 1000)
+                val currentRate = config.network.packetRate
+                val currentIndex = rateOptions.indexOf(currentRate).coerceAtLeast(0)
+
                 RacingSlider(
-                    label = "Packet Rate (Hz)",
-                    value = config.network.packetRate.toFloat(),
-                    onValueChange = { viewModel.updateNetwork { n -> n.copy(packetRate = it.toInt()) } },
-                    valueRange = 10f..200f,
-                    displayValue = "${config.network.packetRate} Hz"
+                    label = "Packet Rate / Latency Mode",
+                    value = currentIndex.toFloat(),
+                    onValueChange = { index ->
+                        val selectedRate = rateOptions[index.toInt().coerceIn(0, rateOptions.lastIndex)]
+                        viewModel.updateNetwork { n -> n.copy(packetRate = selectedRate) }
+                    },
+                    valueRange = 0f..5f,
+                    steps = 4,
+                    displayValue = when (currentRate) {
+                        0 -> "Event-Driven (Low CPU)"
+                        600 -> "600 Hz (High Freq)"
+                        1000 -> "1000 Hz (Ultra Freq)"
+                        else -> "$currentRate Hz"
+                    }
                 )
             }
 

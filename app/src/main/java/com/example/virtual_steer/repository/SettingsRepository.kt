@@ -71,13 +71,20 @@ class SettingsRepository(private val context: Context) {
         val GEAR_UP_Y = floatPreferencesKey("gear_up_y")
         val RADIO_X = floatPreferencesKey("radio_x")
         val RADIO_Y = floatPreferencesKey("radio_y")
-        val PAUSE_SCALE = floatPreferencesKey("pause_scale")
-        val CAM_SCALE = floatPreferencesKey("cam_scale")
-        val LIGHTS_SCALE = floatPreferencesKey("lights_scale")
-        val GEAR_DOWN_SCALE = floatPreferencesKey("gear_down_scale")
-        val HANDBRAKE_SCALE = floatPreferencesKey("handbrake_scale")
-        val GEAR_UP_SCALE = floatPreferencesKey("gear_up_scale")
-        val RADIO_SCALE = floatPreferencesKey("radio_scale")
+        val PAUSE_SCALE_X = floatPreferencesKey("pause_scale_x")
+        val PAUSE_SCALE_Y = floatPreferencesKey("pause_scale_y")
+        val CAM_SCALE_X = floatPreferencesKey("cam_scale_x")
+        val CAM_SCALE_Y = floatPreferencesKey("cam_scale_y")
+        val LIGHTS_SCALE_X = floatPreferencesKey("lights_scale_x")
+        val LIGHTS_SCALE_Y = floatPreferencesKey("lights_scale_y")
+        val GEAR_DOWN_SCALE_X = floatPreferencesKey("gear_down_scale_x")
+        val GEAR_DOWN_SCALE_Y = floatPreferencesKey("gear_down_scale_y")
+        val HANDBRAKE_SCALE_X = floatPreferencesKey("handbrake_scale_x")
+        val HANDBRAKE_SCALE_Y = floatPreferencesKey("handbrake_scale_y")
+        val GEAR_UP_SCALE_X = floatPreferencesKey("gear_up_scale_x")
+        val GEAR_UP_SCALE_Y = floatPreferencesKey("gear_up_scale_y")
+        val RADIO_SCALE_X = floatPreferencesKey("radio_scale_x")
+        val RADIO_SCALE_Y = floatPreferencesKey("radio_scale_y")
     }
 
     val configFlow: Flow<ControllerConfig> = context.dataStore.data
@@ -150,13 +157,20 @@ class SettingsRepository(private val context: Context) {
                     gearUpY = prefs[Keys.GEAR_UP_Y] ?: 0.90f,
                     radioX = prefs[Keys.RADIO_X] ?: 0.88f,
                     radioY = prefs[Keys.RADIO_Y] ?: 0.50f,
-                    pauseScale = prefs[Keys.PAUSE_SCALE] ?: 1.0f,
-                    camScale = prefs[Keys.CAM_SCALE] ?: 1.0f,
-                    lightsScale = prefs[Keys.LIGHTS_SCALE] ?: 1.0f,
-                    gearDownScale = prefs[Keys.GEAR_DOWN_SCALE] ?: 1.0f,
-                    handbrakeScale = prefs[Keys.HANDBRAKE_SCALE] ?: 1.0f,
-                    gearUpScale = prefs[Keys.GEAR_UP_SCALE] ?: 1.0f,
-                    radioScale = prefs[Keys.RADIO_SCALE] ?: 1.0f
+                    pauseScaleX = prefs[Keys.PAUSE_SCALE_X] ?: 1.0f,
+                    pauseScaleY = prefs[Keys.PAUSE_SCALE_Y] ?: 1.0f,
+                    camScaleX = prefs[Keys.CAM_SCALE_X] ?: 1.0f,
+                    camScaleY = prefs[Keys.CAM_SCALE_Y] ?: 1.0f,
+                    lightsScaleX = prefs[Keys.LIGHTS_SCALE_X] ?: 1.0f,
+                    lightsScaleY = prefs[Keys.LIGHTS_SCALE_Y] ?: 1.0f,
+                    gearDownScaleX = prefs[Keys.GEAR_DOWN_SCALE_X] ?: 1.0f,
+                    gearDownScaleY = prefs[Keys.GEAR_DOWN_SCALE_Y] ?: 1.0f,
+                    handbrakeScaleX = prefs[Keys.HANDBRAKE_SCALE_X] ?: 1.0f,
+                    handbrakeScaleY = prefs[Keys.HANDBRAKE_SCALE_Y] ?: 1.0f,
+                    gearUpScaleX = prefs[Keys.GEAR_UP_SCALE_X] ?: 1.0f,
+                    gearUpScaleY = prefs[Keys.GEAR_UP_SCALE_Y] ?: 1.0f,
+                    radioScaleX = prefs[Keys.RADIO_SCALE_X] ?: 1.0f,
+                    radioScaleY = prefs[Keys.RADIO_SCALE_Y] ?: 1.0f
                 )
             )
         }
@@ -292,13 +306,20 @@ class SettingsRepository(private val context: Context) {
             prefs[Keys.GEAR_UP_Y] = current.gearUpY
             prefs[Keys.RADIO_X] = current.radioX
             prefs[Keys.RADIO_Y] = current.radioY
-            prefs[Keys.PAUSE_SCALE] = current.pauseScale
-            prefs[Keys.CAM_SCALE] = current.camScale
-            prefs[Keys.LIGHTS_SCALE] = current.lightsScale
-            prefs[Keys.GEAR_DOWN_SCALE] = current.gearDownScale
-            prefs[Keys.HANDBRAKE_SCALE] = current.handbrakeScale
-            prefs[Keys.GEAR_UP_SCALE] = current.gearUpScale
-            prefs[Keys.RADIO_SCALE] = current.radioScale
+            prefs[Keys.PAUSE_SCALE_X] = current.pauseScaleX
+            prefs[Keys.PAUSE_SCALE_Y] = current.pauseScaleY
+            prefs[Keys.CAM_SCALE_X] = current.camScaleX
+            prefs[Keys.CAM_SCALE_Y] = current.camScaleY
+            prefs[Keys.LIGHTS_SCALE_X] = current.lightsScaleX
+            prefs[Keys.LIGHTS_SCALE_Y] = current.lightsScaleY
+            prefs[Keys.GEAR_DOWN_SCALE_X] = current.gearDownScaleX
+            prefs[Keys.GEAR_DOWN_SCALE_Y] = current.gearDownScaleY
+            prefs[Keys.HANDBRAKE_SCALE_X] = current.handbrakeScaleX
+            prefs[Keys.HANDBRAKE_SCALE_Y] = current.handbrakeScaleY
+            prefs[Keys.GEAR_UP_SCALE_X] = current.gearUpScaleX
+            prefs[Keys.GEAR_UP_SCALE_Y] = current.gearUpScaleY
+            prefs[Keys.RADIO_SCALE_X] = current.radioScaleX
+            prefs[Keys.RADIO_SCALE_Y] = current.radioScaleY
         }
     }
 
