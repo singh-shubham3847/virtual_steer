@@ -24,6 +24,10 @@ data class ControllerState(
     val rb: Boolean = false,
     val back: Boolean = false,
 
+    // Look Around
+    val lookX: Float = 0f,
+    val lookY: Float = 0f,
+
     // Telemetry
     val connected: Boolean = false,
     val latency: Int = 0

@@ -25,6 +25,8 @@ class PacketSerializer {
         buffer.putFloat(PacketOffset.CLUTCH, state.clutch)
 
         buffer.putShort(PacketOffset.BUTTONS, packButtons(state))
+        buffer.putFloat(PacketOffset.LOOK_X, state.lookX)
+        buffer.putFloat(PacketOffset.LOOK_Y, state.lookY)
 
         // Reset CRC field before calculation
         buffer.putShort(PacketOffset.CRC, 0)
@@ -77,6 +79,8 @@ class PacketSerializer {
         val brake = readBuffer.getFloat(PacketOffset.BRAKE)
         val clutch = readBuffer.getFloat(PacketOffset.CLUTCH)
         val buttons = readBuffer.getShort(PacketOffset.BUTTONS).toInt()
+        val lookX = readBuffer.getFloat(PacketOffset.LOOK_X)
+        val lookY = readBuffer.getFloat(PacketOffset.LOOK_Y)
 
         return ControllerState(
             steering = steering,
@@ -96,7 +100,9 @@ class PacketSerializer {
             dpadRight = (buttons and (1 shl 10)) != 0,
             lb = (buttons and (1 shl 11)) != 0,
             rb = (buttons and (1 shl 12)) != 0,
-            back = (buttons and (1 shl 13)) != 0
+            back = (buttons and (1 shl 13)) != 0,
+            lookX = lookX,
+            lookY = lookY
         )
     }
 }

@@ -85,6 +85,10 @@ fun NavGraph(
                 radioY = config.ui.radioY,
                 radioScaleX = config.ui.radioScaleX,
                 radioScaleY = config.ui.radioScaleY,
+                lookX = config.ui.lookX,
+                lookY = config.ui.lookY,
+                lookScaleX = config.ui.lookScaleX,
+                lookScaleY = config.ui.lookScaleY,
                 onBackClick = { navController.popBackStack() },
                 onBrakeChange = { controllerViewModel.updateBrake(it) },
                 onThrottleChange = { controllerViewModel.updateThrottle(it) },
@@ -95,7 +99,8 @@ fun NavGraph(
                 onCamClick = { controllerViewModel.pulseCamera() },
                 onLightsClick = { controllerViewModel.pulseHeadlights() },
                 onRadioClick = { controllerViewModel.pulseDpadRight() },
-                onSaveLayout = { pX, pY, pSX, pSY, cX, cY, cSX, cSY, lX, lY, lSX, lSY, gdX, gdY, gdSX, gdSY, hX, hY, hSX, hSY, guX, guY, guSX, guSY, rX, rY, rSX, rSY ->
+                onLookChange = { x, y -> controllerViewModel.updateLook(x, y) },
+                onSaveLayout = { pX, pY, pSX, pSY, cX, cY, cSX, cSY, lX, lY, lSX, lSY, gdX, gdY, gdSX, gdSY, hX, hY, hSX, hSY, guX, guY, guSX, guSY, rX, rY, rSX, rSY, lkX, lkY, lkSX, lkSY ->
                     settingsViewModel.updateUI { u ->
                         u.copy(
                             pauseX = pX, pauseY = pY, pauseScaleX = pSX, pauseScaleY = pSY,
@@ -104,7 +109,8 @@ fun NavGraph(
                             gearDownX = gdX, gearDownY = gdY, gearDownScaleX = gdSX, gearDownScaleY = gdSY,
                             handbrakeX = hX, handbrakeY = hY, handbrakeScaleX = hSX, handbrakeScaleY = hSY,
                             gearUpX = guX, gearUpY = guY, gearUpScaleX = guSX, gearUpScaleY = guSY,
-                            radioX = rX, radioY = rY, radioScaleX = rSX, radioScaleY = rSY
+                            radioX = rX, radioY = rY, radioScaleX = rSX, radioScaleY = rSY,
+                            lookX = lkX, lookY = lkY, lookScaleX = lkSX, lookScaleY = lkSY
                         )
                     }
                 }
@@ -171,6 +177,10 @@ fun NavGraph(
                 radioY = config.ui.radioY,
                 radioScaleX = config.ui.radioScaleX,
                 radioScaleY = config.ui.radioScaleY,
+                lookX = config.ui.lookX,
+                lookY = config.ui.lookY,
+                lookScaleX = config.ui.lookScaleX,
+                lookScaleY = config.ui.lookScaleY,
                 onBackClick = { navController.popBackStack() },
                 onBrakeChange = { controllerViewModel.updateBrake(it) },
                 onThrottleChange = { controllerViewModel.updateThrottle(it) },
@@ -181,7 +191,8 @@ fun NavGraph(
                 onCamClick = { controllerViewModel.pulseCamera() },
                 onLightsClick = { controllerViewModel.pulseHeadlights() },
                 onRadioClick = { controllerViewModel.pulseDpadRight() },
-                onSaveLayout = { pX, pY, pSX, pSY, cX, cY, cSX, cSY, lX, lY, lSX, lSY, gdX, gdY, gdSX, gdSY, hX, hY, hSX, hSY, guX, guY, guSX, guSY, rX, rY, rSX, rSY ->
+                onLookChange = { x, y -> controllerViewModel.updateLook(x, y) },
+                onSaveLayout = { pX, pY, pSX, pSY, cX, cY, cSX, cSY, lX, lY, lSX, lSY, gdX, gdY, gdSX, gdSY, hX, hY, hSX, hSY, guX, guY, guSX, guSY, rX, rY, rSX, rSY, lkX, lkY, lkSX, lkSY ->
                     settingsViewModel.updateUI { u ->
                         u.copy(
                             pauseX = pX, pauseY = pY, pauseScaleX = pSX, pauseScaleY = pSY,
@@ -190,7 +201,8 @@ fun NavGraph(
                             gearDownX = gdX, gearDownY = gdY, gearDownScaleX = gdSX, gearDownScaleY = gdSY,
                             handbrakeX = hX, handbrakeY = hY, handbrakeScaleX = hSX, handbrakeScaleY = hSY,
                             gearUpX = guX, gearUpY = guY, gearUpScaleX = guSX, gearUpScaleY = guSY,
-                            radioX = rX, radioY = rY, radioScaleX = rSX, radioScaleY = rSY
+                            radioX = rX, radioY = rY, radioScaleX = rSX, radioScaleY = rSY,
+                            lookX = lkX, lookY = lkY, lookScaleX = lkSX, lookScaleY = lkSY
                         )
                     }
                     navController.popBackStack() // Go back to settings after saving layout config

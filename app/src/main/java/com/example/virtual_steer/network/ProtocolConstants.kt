@@ -9,6 +9,7 @@ object PacketOffset {
     const val BRAKE = 12
     const val CLUTCH = 16
     const val BUTTONS = 20
-    const val RESERVED = 21
-    const val CRC = 22
+    const val LOOK_X = 22
+    const val LOOK_Y = 26
+    const val CRC = 30
 }

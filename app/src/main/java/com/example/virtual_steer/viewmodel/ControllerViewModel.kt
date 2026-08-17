@@ -222,6 +222,7 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     fun updateBrake(value: Float) = controllerEngine.updateBrake(value)
     fun updateThrottle(value: Float) = controllerEngine.updateThrottle(value)
     fun updateClutch(value: Float) = controllerEngine.updateClutch(value)
+    fun updateLook(x: Float, y: Float) = controllerEngine.updateLook(x, y)
     fun updateHandbrake(value: Boolean) = controllerEngine.updateHandbrake(value)
     fun updateGearUp(value: Boolean) = controllerEngine.updateGearUp(value)
     fun updateGearDown(value: Boolean) = controllerEngine.updateGearDown(value)

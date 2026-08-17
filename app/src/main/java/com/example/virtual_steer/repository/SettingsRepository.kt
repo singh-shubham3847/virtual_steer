@@ -85,6 +85,10 @@ class SettingsRepository(private val context: Context) {
         val GEAR_UP_SCALE_Y = floatPreferencesKey("gear_up_scale_y")
         val RADIO_SCALE_X = floatPreferencesKey("radio_scale_x")
         val RADIO_SCALE_Y = floatPreferencesKey("radio_scale_y")
+        val LOOK_X = floatPreferencesKey("look_x")
+        val LOOK_Y = floatPreferencesKey("look_y")
+        val LOOK_SCALE_X = floatPreferencesKey("look_scale_x")
+        val LOOK_SCALE_Y = floatPreferencesKey("look_scale_y")
     }
 
     val configFlow: Flow<ControllerConfig> = context.dataStore.data
@@ -157,6 +161,8 @@ class SettingsRepository(private val context: Context) {
                     gearUpY = prefs[Keys.GEAR_UP_Y] ?: 0.90f,
                     radioX = prefs[Keys.RADIO_X] ?: 0.88f,
                     radioY = prefs[Keys.RADIO_Y] ?: 0.50f,
+                    lookX = prefs[Keys.LOOK_X] ?: 0.12f,
+                    lookY = prefs[Keys.LOOK_Y] ?: 0.50f,
                     pauseScaleX = prefs[Keys.PAUSE_SCALE_X] ?: 1.0f,
                     pauseScaleY = prefs[Keys.PAUSE_SCALE_Y] ?: 1.0f,
                     camScaleX = prefs[Keys.CAM_SCALE_X] ?: 1.0f,
@@ -170,7 +176,9 @@ class SettingsRepository(private val context: Context) {
                     gearUpScaleX = prefs[Keys.GEAR_UP_SCALE_X] ?: 1.0f,
                     gearUpScaleY = prefs[Keys.GEAR_UP_SCALE_Y] ?: 1.0f,
                     radioScaleX = prefs[Keys.RADIO_SCALE_X] ?: 1.0f,
-                    radioScaleY = prefs[Keys.RADIO_SCALE_Y] ?: 1.0f
+                    radioScaleY = prefs[Keys.RADIO_SCALE_Y] ?: 1.0f,
+                    lookScaleX = prefs[Keys.LOOK_SCALE_X] ?: 1.0f,
+                    lookScaleY = prefs[Keys.LOOK_SCALE_Y] ?: 1.0f
                 )
             )
         }
@@ -279,7 +287,25 @@ class SettingsRepository(private val context: Context) {
                 gearUpX = prefs[Keys.GEAR_UP_X] ?: 0.62f,
                 gearUpY = prefs[Keys.GEAR_UP_Y] ?: 0.90f,
                 radioX = prefs[Keys.RADIO_X] ?: 0.88f,
-                radioY = prefs[Keys.RADIO_Y] ?: 0.50f
+                radioY = prefs[Keys.RADIO_Y] ?: 0.50f,
+                lookX = prefs[Keys.LOOK_X] ?: 0.12f,
+                lookY = prefs[Keys.LOOK_Y] ?: 0.50f,
+                pauseScaleX = prefs[Keys.PAUSE_SCALE_X] ?: 1.0f,
+                pauseScaleY = prefs[Keys.PAUSE_SCALE_Y] ?: 1.0f,
+                camScaleX = prefs[Keys.CAM_SCALE_X] ?: 1.0f,
+                camScaleY = prefs[Keys.CAM_SCALE_Y] ?: 1.0f,
+                lightsScaleX = prefs[Keys.LIGHTS_SCALE_X] ?: 1.0f,
+                lightsScaleY = prefs[Keys.LIGHTS_SCALE_Y] ?: 1.0f,
+                gearDownScaleX = prefs[Keys.GEAR_DOWN_SCALE_X] ?: 1.0f,
+                gearDownScaleY = prefs[Keys.GEAR_DOWN_SCALE_Y] ?: 1.0f,
+                handbrakeScaleX = prefs[Keys.HANDBRAKE_SCALE_X] ?: 1.0f,
+                handbrakeScaleY = prefs[Keys.HANDBRAKE_SCALE_Y] ?: 1.0f,
+                gearUpScaleX = prefs[Keys.GEAR_UP_SCALE_X] ?: 1.0f,
+                gearUpScaleY = prefs[Keys.GEAR_UP_SCALE_Y] ?: 1.0f,
+                radioScaleX = prefs[Keys.RADIO_SCALE_X] ?: 1.0f,
+                radioScaleY = prefs[Keys.RADIO_SCALE_Y] ?: 1.0f,
+                lookScaleX = prefs[Keys.LOOK_SCALE_X] ?: 1.0f,
+                lookScaleY = prefs[Keys.LOOK_SCALE_Y] ?: 1.0f
             ))
             prefs[Keys.DARK_THEME] = current.darkTheme
             prefs[Keys.ACCENT_COLOR] = current.accentColor
@@ -306,6 +332,8 @@ class SettingsRepository(private val context: Context) {
             prefs[Keys.GEAR_UP_Y] = current.gearUpY
             prefs[Keys.RADIO_X] = current.radioX
             prefs[Keys.RADIO_Y] = current.radioY
+            prefs[Keys.LOOK_X] = current.lookX
+            prefs[Keys.LOOK_Y] = current.lookY
             prefs[Keys.PAUSE_SCALE_X] = current.pauseScaleX
             prefs[Keys.PAUSE_SCALE_Y] = current.pauseScaleY
             prefs[Keys.CAM_SCALE_X] = current.camScaleX
@@ -320,6 +348,8 @@ class SettingsRepository(private val context: Context) {
             prefs[Keys.GEAR_UP_SCALE_Y] = current.gearUpScaleY
             prefs[Keys.RADIO_SCALE_X] = current.radioScaleX
             prefs[Keys.RADIO_SCALE_Y] = current.radioScaleY
+            prefs[Keys.LOOK_SCALE_X] = current.lookScaleX
+            prefs[Keys.LOOK_SCALE_Y] = current.lookScaleY
         }
     }
 

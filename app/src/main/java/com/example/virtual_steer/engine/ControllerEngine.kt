@@ -51,6 +51,10 @@ class ControllerEngine {
         _controllerState.update { it.copy(clutch = value) }
     }
 
+    fun updateLook(x: Float, y: Float) {
+        _controllerState.update { it.copy(lookX = x, lookY = y) }
+    }
+
     fun updateNetworkDiagnostics(network: NetworkDiagnostics) {
         _diagnostics.update { it.copy(network = network) }
     }

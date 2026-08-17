@@ -71,6 +71,10 @@ fun DrivingScreen(
     radioY: Float = 0.50f,
     radioScaleX: Float = 1.0f,
     radioScaleY: Float = 1.0f,
+    lookX: Float = 0.12f,
+    lookY: Float = 0.50f,
+    lookScaleX: Float = 1.0f,
+    lookScaleY: Float = 1.0f,
 
     onPauseClick: () -> Unit = {},
     onCamClick: () -> Unit = {},
@@ -82,6 +86,7 @@ fun DrivingScreen(
     onGearDownChange: (Boolean) -> Unit = {},
     onGearUpChange: (Boolean) -> Unit = {},
     onRadioClick: () -> Unit = {},
+    onLookChange: (Float, Float) -> Unit = { _, _ -> },
     onSaveLayout: (
         pauseX: Float, pauseY: Float, pauseScaleX: Float, pauseScaleY: Float,
         camX: Float, camY: Float, camScaleX: Float, camScaleY: Float,
@@ -89,8 +94,9 @@ fun DrivingScreen(
         gearDownX: Float, gearDownY: Float, gearDownScaleX: Float, gearDownScaleY: Float,
         handbrakeX: Float, handbrakeY: Float, handbrakeScaleX: Float, handbrakeScaleY: Float,
         gearUpX: Float, gearUpY: Float, gearUpScaleX: Float, gearUpScaleY: Float,
-        radioX: Float, radioY: Float, radioScaleX: Float, radioScaleY: Float
-    ) -> Unit = { _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_ -> },
+        radioX: Float, radioY: Float, radioScaleX: Float, radioScaleY: Float,
+        lookX: Float, lookY: Float, lookScaleX: Float, lookScaleY: Float
+    ) -> Unit = { _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_, _,_,_,_ -> },
     onBrakeDiagnostics: (PedalDiagnostics) -> Unit = {},
     onThrottleDiagnostics: (PedalDiagnostics) -> Unit = {}
 ) {
@@ -130,6 +136,9 @@ fun DrivingScreen(
     var gearUpSY by remember(gearUpScaleY) { mutableFloatStateOf(gearUpScaleY) }
     var radioSX by remember(radioScaleX) { mutableFloatStateOf(radioScaleX) }
     var radioSY by remember(radioScaleY) { mutableFloatStateOf(radioScaleY) }
+    var lookPos by remember(lookX, lookY) { mutableStateOf(Offset(lookX, lookY)) }
+    var lookSX by remember(lookScaleX) { mutableFloatStateOf(lookScaleX) }
+    var lookSY by remember(lookScaleY) { mutableFloatStateOf(lookScaleY) }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -332,7 +341,8 @@ fun DrivingScreen(
                             gearDownPos.x, gearDownPos.y, gearDownSX, gearDownSY,
                             handbrakePos.x, handbrakePos.y, handbrakeSX, handbrakeSY,
                             gearUpPos.x, gearUpPos.y, gearUpSX, gearUpSY,
-                            radioPos.x, radioPos.y, radioSX, radioSY
+                            radioPos.x, radioPos.y, radioSX, radioSY,
+                            lookPos.x, lookPos.y, lookSX, lookSY
                         )
                     },
                     color = ThrottleGreen
@@ -458,7 +468,7 @@ fun DrivingScreen(
         if (showRadio) {
             LayoutEditorItem(
                 position = radioPos,
-                baseWidthDp = 80,
+                baseWidthDp = 68,
                 baseHeightDp = 42,
                 scaleX = radioSX,
                 scaleY = radioSY,
@@ -466,12 +476,29 @@ fun DrivingScreen(
                 onScaleXChanged = { radioSX = it },
                 onScaleYChanged = { radioSY = it }
             ) {
-                RacingButton(
-                    text = "📻 RADIO",
+                HudButton(
+                    label = "📻 Radio",
                     modifier = Modifier.fillMaxSize(),
                     onClick = { if (!isEditingLayout) onRadioClick() }
                 )
             }
+        }
+
+        // LOOK Around Joystick
+        LayoutEditorItem(
+            position = lookPos,
+            baseWidthDp = 90,
+            baseHeightDp = 90,
+            scaleX = lookSX,
+            scaleY = lookSY,
+            onPositionChanged = { lookPos = it },
+            onScaleXChanged = { lookSX = it },
+            onScaleYChanged = { lookSY = it }
+        ) {
+            LookJoystick(
+                modifier = Modifier.fillMaxSize(),
+                onLookChange = { x, y -> if (!isEditingLayout) onLookChange(x, y) }
+            )
         }
 
         // Layout Editor Hint Overlay
@@ -538,6 +565,64 @@ private fun HudButton(
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace
+        )
+    }
+}
+
+@Composable
+fun LookJoystick(
+    modifier: Modifier = Modifier,
+    onLookChange: (Float, Float) -> Unit
+) {
+    var dragOffset by remember { mutableStateOf(Offset.Zero) }
+
+    BoxWithConstraints(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clip(CircleShape)
+            .background(Color.White.copy(alpha = 0.05f))
+            .border(1.5.dp, Color.White.copy(alpha = 0.15f), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        val radiusPx = constraints.maxWidth.toFloat() / 2f
+        val thumbRadiusDp = 18.dp
+
+        Box(
+            modifier = Modifier
+                .offset(
+                    x = with(LocalDensity.current) { dragOffset.x.toDp() },
+                    y = with(LocalDensity.current) { dragOffset.y.toDp() }
+                )
+                .size(thumbRadiusDp * 2)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.15f))
+                .border(1.5.dp, ThrottleGreen, CircleShape)
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragEnd = {
+                            dragOffset = Offset.Zero
+                            onLookChange(0f, 0f)
+                        },
+                        onDragCancel = {
+                            dragOffset = Offset.Zero
+                            onLookChange(0f, 0f)
+                        }
+                    ) { change, dragAmount ->
+                        change.consume()
+                        val newOffset = dragOffset + dragAmount
+                        val distance = newOffset.getDistance()
+
+                        dragOffset = if (distance <= radiusPx) {
+                            newOffset
+                        } else {
+                            newOffset / distance * radiusPx
+                        }
+
+                        val normX = dragOffset.x / radiusPx
+                        val normY = -dragOffset.y / radiusPx // Invert Y for controller axis
+                        onLookChange(normX, normY)
+                    }
+                }
         )
     }
 }

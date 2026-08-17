@@ -31,6 +31,8 @@ data class UIConfig(
     val gearUpY: Float = 0.90f,
     val radioX: Float = 0.88f,
     val radioY: Float = 0.50f,
+    val lookX: Float = 0.12f,
+    val lookY: Float = 0.50f,
     
     // Custom button sizes/scales
     val pauseScaleX: Float = 1.0f,
@@ -46,5 +48,7 @@ data class UIConfig(
     val gearUpScaleX: Float = 1.0f,
     val gearUpScaleY: Float = 1.0f,
     val radioScaleX: Float = 1.0f,
-    val radioScaleY: Float = 1.0f
+    val radioScaleY: Float = 1.0f,
+    val lookScaleX: Float = 1.0f,
+    val lookScaleY: Float = 1.0f
 )
